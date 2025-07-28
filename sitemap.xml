@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://sabellesings.com/</loc>
+    <lastmod>2025-01-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    
+    <!-- Image references for better SEO -->
+    <image:image>
+      <image:loc>https://sabellesings.com/images/tell-me-your-heart.png</image:loc>
+      <image:title>Tell Me Your Heart by Sabelle - Album Cover</image:title>
+      <image:caption>Latest folk music single from singer songwriter Sabelle</image:caption>
+    </image:image>
+    
+    <image:image>
+      <image:loc>https://sabellesings.com/images/im-blushin.png</image:loc>
+      <image:title>I'm Blushin' by Sabelle - Album Cover</image:title>
+      <image:caption>Heartfelt folk music single by singer songwriter Sabelle</image:caption>
+    </image:image>
+    
+    <image:image>
+      <image:loc>https://sabellesings.com/images/party-boy.png</image:loc>
+      <image:title>Party Boy by Sabelle - Album Cover</image:title>
+      <image:caption>Upcoming folk music single from singer songwriter Sabelle</image:caption>
+    </image:image>
+  </url>
+</urlset> 
