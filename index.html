@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabelle - Official Website</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --primary-color: #c8a2c8; /* Mauve from "Tell Me Your Heart" */
+            --secondary-color: #ff69b4; /* Pink from "I'm Blushin'" */
+            --accent-color: #fada5e; /* Yellow from "Party Boy" */
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        /* --- Navigation --- */
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--card-bg);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 300;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            align-items: center;
+            gap: 3rem;
+            margin-top: 4rem;
+            min-height: 70vh;
+        }
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-text .highlight {
+            color: var(--primary-color);
+            font-style: italic;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--primary-color);
+            color: var(--bg-color);
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: var(--secondary-color);
+        }
+
+        .hero-image {
+            background-image: url('images/tell-me-your-heart.png');
+            background-size: contain;
+            background-position: center;
+            height: 100%;
+            min-height: 400px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- Section --- */
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-style: italic;
+        }
+
+        /* --- Music Section --- */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .song-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .song-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .song-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .song-info {
+            padding: 1.5rem;
+        }
+
+        .song-info h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .song-info p {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .play-button {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: var(--bg-color);
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        .play-button.party-boy {
+            background-color: var(--accent-color);
+        }
+
+        .play-button:hover {
+            opacity: 0.8;
+        }
+
+        /* --- Tour Section --- */
+        #tour {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 4rem;
+        }
+        
+        .tour-list {
+            list-style: none;
+        }
+
+        .tour-item {
+            display: grid;
+            grid-template-columns: 100px 1fr 1fr;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .tour-item:last-child {
+            border-bottom: none;
+        }
+
+        .tour-date {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .tour-venue {
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .tour-location {
+            font-size: 1rem;
+            color: #aaa;
+            justify-self: end;
+        }
+        
+        /* --- Footer --- */
+        .main-footer {
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 1px solid var(--card-bg);
+            margin-top: 4rem;
+        }
+        
+        .social-links a {
+            margin: 0 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .main-footer p {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-image {
+                grid-row: 1;
+                min-height: 300px;
+            }
+
+            .hero-text {
+                margin-top: 2rem;
+            }
+            
+            .hero-text h1 {
+                font-size: 3rem;
+            }
+
+            .nav-links {
+                display: none; /* Simple hiding for now, can be a hamburger menu */
+            }
+
+            .tour-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .tour-location {
+                justify-self: center;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="main-nav container">
+        <a href="#" class="logo">Sabelle</a>
+        <ul class="nav-links">
+            <li><a href="#music">Music</a></li>
+            <li><a href="#tour">Tour</a></li>
+            <li><a href="https://open.spotify.com/artist/5mNeKvVHPf7uVe0VsHsqKL" target="_blank">Spotify</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero container">
+        <div class="hero-text">
+            <h1>Tell Me <span class="highlight">Your</span> Heart</h1>
+            <p>The latest single from Sabelle is out now. Dive into a world of poetic lyricism and folk sounds.</p>
+            <a href="https://open.spotify.com/search/Sabelle%20Tell%20Me%20Your%20Heart" class="cta-button" target="_blank">Listen Now</a>
+        </div>
+        <div class="hero-image"></div>
+    </header>
+
+    <main>
+        <section id="music" class="section container">
+            <h2 class="section-title">Latest Releases</h2>
+            <div class="music-grid">
+                
+                <div class="song-card">
+                    <img src="images/im-blushin.png" alt="Cover for I'm Blushin'">
+                    <div class="song-info">
+                        <h3>I'm Blushin'</h3>
+                        <p>First of the three singles</p>
+                        <a href="https://open.spotify.com/search/Sabelle%20I'm%20Blushin'" class="play-button" target="_blank">Play on Spotify</a>
+                    </div>
+                </div>
+
+                <div class="song-card">
+                    <img src="images/party-boy.png" alt="Cover for Party Boy">
+                    <div class="song-info">
+                        <h3>Party Boy</h3>
+                        <p>Upcoming Single</p>
+                        <a href="#" class="play-button party-boy">Coming Soon</a>
+                    </div>
+                </div>
+                
+                <div class="song-card">
+                    <img src="images/tell-me-your-heart.png" alt="Cover for Tell Me Your Heart">
+                    <div class="song-info">
+                        <h3>Tell Me Your Heart</h3>
+                        <p>Latest Release</p>
+                        <a href="https://open.spotify.com/search/Sabelle%20Tell%20Me%20Your%20Heart" class="play-button" target="_blank">Play on Spotify</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="tour" class="section container">
+            <h2 class="section-title">The Dusk to Dawn Tour</h2>
+            <ul class="tour-list">
+                 <li class="tour-item">
+                    <div class="tour-date">07.02</div>
+                    <div class="tour-venue">710 Beach Club</div>
+                    <div class="tour-location">San Diego, CA</div>
+                </li>
+                <li class="tour-item">
+                    <div class="tour-date">07.03</div>
+                    <div class="tour-venue">Writers Round @ Laguna Beer Co.</div>
+                    <div class="tour-location">Laguna Beach, CA</div>
+                </li>
+                <li class="tour-item">
+                    <div class="tour-date">07.07</div>
+                    <div class="tour-venue">The Escondite</div>
+                    <div class="tour-location">Los Angeles, CA</div>
+                </li>
+                 <li class="tour-item">
+                    <div class="tour-date">07.08</div>
+                    <div class="tour-venue">Open Folk @ The Hotel Cafe</div>
+                    <div class="tour-location">Los Angeles, CA</div>
+                </li>
+                <li class="tour-item">
+                    <div class="date-day">07.09</div>
+                    <div class="venue-name">Writers Round @ Ivanhoe</div>
+                    <div class="venue-location">Los Angeles, CA</div>
+                </li>
+                <li class="tour-item">
+                    <div class="tour-date">07.11</div>
+                    <div class="tour-venue">Bargetto Winery</div>
+                    <div class="tour-location">Monterey, CA</div>
+                </li>
+                 <li class="tour-item">
+                    <div class="tour-date">07.20</div>
+                    <div class="tour-venue">Bunk & Brew</div>
+                    <div class="tour-location">Bend, OR</div>
+                </li>
+                 <li class="tour-item">
+                    <div class="tour-date">07.24</div>
+                    <div class="tour-venue">Atlantis Lounge</div>
+                    <div class="tour-location">Portland, OR</div>
+                </li>
+                 <li class="tour-item">
+                    <div class="tour-date">07.25</div>
+                    <div class="tour-venue">Alberta St Pub</div>
+                    <div class="tour-location">Portland, OR</div>
+                </li>
+                <li class="tour-item">
+                    <div class="tour-date">07.29</div>
+                    <div class="tour-venue">Rhythms Coffee</div>
+                    <div class="tour-location">Olympia, WA</div>
+                </li>
+                <li class="tour-item">
+                    <div class="tour-date">07.30</div>
+                    <div class="tour-venue">Bad Bar</div>
+                    <div class="tour-location">Seattle, WA</div>
+                </li>
+                 <li class="tour-item">
+                    <div class="tour-date">07.31</div>
+                    <div class="tour-venue">The Orion</div>
+                    <div class="tour-location">Bellingham, WA</div>
+                </li>
+                 <li class="tour-item">
+                    <div class="tour-date">08.03</div>
+                    <div class="tour-venue">GreyLabs</div>
+                    <div class="tour-location">Vancouver, BC</div>
+                </li>
+                <li class="tour-item">
+                    <div class="tour-date">08.05</div>
+                    <div class="tour-venue">The Blarney Stone</div>
+                    <div class="tour-location">Vancouver, BC</div>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="social-links">
+            <a href="https://open.spotify.com/artist/5mNeKvVHPf7uVe0VsHsqKL" target="_blank" title="Spotify">
+                <svg fill="currentColor"_fill="currentColor" height="24" width="24" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.183 14.226c-.202.31-.555.426-.865.223-2.61-1.603-5.877-1.97-9.756-1.077-.36.083-.67-.14-.753-.5-.084-.36.14-.67.5-.753 4.237-.98 7.82- .55 10.686 1.22.31.202.427.555.223.865zm1.22-2.77c-.243.37-.69.496-1.06.252-2.955-1.815-7.375-2.333-11.056-1.28-.42.117-.83-.122-.95-.54-.117-.42.12-.83.54-.95 4.11-1.17 8.94-.607 12.21 1.48.37.244.496.69.253 1.06zm.134-2.95c-.313.454-.863.6-1.317.284-3.48-2.14-8.77-2.324-12.834-1.277-.504.133-.995-.19-1.127-.694-.133-.504.19-.995.694-1.127C6.31 3.29 11.97 3.5 15.89 5.89c.454.313.6.864.283 1.317z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/sabellesings/" target="_blank" title="Instagram">
+                <svg fill="currentColor" height="24" width="24" viewBox="0 0 24 24"><path d="M12 2c-2.717 0-3.056.01-4.122.06-1.065.05-1.79.217-2.428.465a4.89 4.89 0 0 0-1.772 1.153 4.903 4.903 0 0 0-1.153 1.772c-.247.637-.415 1.363-.465 2.428C2.01 8.944 2 9.283 2 12s.01 3.056.06 4.122c.05 1.065.218 1.79.465 2.428a4.89 4.89 0 0 0 1.153 1.772 4.903 4.903 0 0 0 1.772 1.153c.637.247 1.363.415 2.428.465C8.944 21.99 9.283 22 12 22s3.056-.01 4.122-.06c1.065-.05 1.79-.218 2.428-.465a4.89 4.89 0 0 0 1.772-1.153 4.903 4.903 0 0 0 1.153-1.772c.247-.637.415-1.363.465-2.428C21.99 15.056 22 14.717 22 12s-.01-3.056-.06-4.122c-.05-1.065-.218-1.79-.465-2.428a4.89 4.89 0 0 0-1.153-1.772 4.903 4.903 0 0 0-1.772-1.153c-.637-.247-1.363-.415-2.428-.465C15.056 2.01 14.717 2 12 2zm0 1.8c2.65 0 2.953.01 4.002.058.98.046 1.504.207 1.918.372a2.91 2.91 0 0 1 1.06 1.06c.165.414.326.938.372 1.918.048 1.05.058 1.353.058 4.002s-.01 2.953-.058 4.002c-.046.98-.207 1.504-.372 1.918a2.91 2.91 0 0 1-1.06 1.06c-.414.165-.938.326-1.918.372-1.05.048-1.353.058-4.002.058s-2.953-.01-4.002-.058c-.98-.046-1.504-.207-1.918-.372a2.91 2.91 0 0 1-1.06-1.06c-.165-.414-.326-.938-.372-1.918-.048-1.05-.058-1.353-.058-4.002s.01-2.953.058-4.002c.046-.98.207-1.504.372-1.918a2.91 2.91 0 0 1 1.06-1.06c.414-.165.938-.326 1.918-.372C9.047 3.81 9.35 3.8 12 3.8zm0 3.35c-2.404 0-4.35 1.946-4.35 4.35s1.946 4.35 4.35 4.35 4.35-1.946 4.35-4.35S14.404 7.15 12 7.15zm0 7.2c-1.574 0-2.85-1.276-2.85-2.85S10.426 8.65 12 8.65s2.85 1.276 2.85 2.85S13.574 14.35 12 14.35zm5.405-7.55a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4z"/></svg>
+            </a>
+        </div>
+        <p>&copy; 2025 Sabelle. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html> 
