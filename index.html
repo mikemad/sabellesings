@@ -522,6 +522,8 @@
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         .song-card:hover {
@@ -537,6 +539,9 @@
 
         .song-info {
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .song-info h3 {
@@ -560,6 +565,9 @@
             border-radius: 50px;
             font-weight: 600;
             transition: background-color 0.3s ease;
+            margin-top: auto;
+            width: max-content;
+            text-align: center;
         }
         
         .play-button.party-boy {
@@ -704,8 +712,8 @@
     <header class="hero container" role="banner">
         <div class="hero-text">
             <h1>Party <span class="highlight">Boy</span></h1>
-            <p>The upcoming release from Sabelle. Get ready for a new folk sound from this talented singer songwriter.</p>
-            <a href="https://distrokid.com/hyperfollow/sabelle1/party-boy" class="cta-button" target="_blank" rel="noopener" aria-label="Pre-save Party Boy by Sabelle">Pre-Save Now</a>
+            <p>A fresh new single from Sabelle that’s impossible to ignore.</p>
+            <a href="https://open.spotify.com/track/0eMAwLd9y4mETHMKLjn0jf?si=d4ce57def71b4983" class="cta-button" target="_blank" rel="noopener" aria-label="Listen to Party Boy by Sabelle on Spotify">Listen on Spotify</a>
         </div>
         <div class="hero-image" role="img" aria-label="Party Boy album cover by Sabelle"></div>
     </header>
@@ -729,11 +737,11 @@
                 </article>
 
                 <article class="song-card" itemscope itemtype="https://schema.org/MusicRecording">
-                    <img src="images/party-boy.png" alt="Party Boy by Sabelle - Upcoming Folk Music Single Album Cover" loading="lazy">
+                    <img src="images/party-boy.png" alt="Party Boy by Sabelle - Single Cover" loading="lazy">
                     <div class="song-info">
                         <h3 itemprop="name">Party Boy</h3>
-                        <p itemprop="description">Upcoming Single - New folk music from Sabelle</p>
-                        <a href="#" class="play-button party-boy" aria-label="Party Boy by Sabelle - Coming Soon">Coming Soon</a>
+                        <p itemprop="description">New Release - Out now</p>
+                        <a href="https://open.spotify.com/track/0eMAwLd9y4mETHMKLjn0jf?si=d4ce57def71b4983" class="play-button party-boy" target="_blank" rel="noopener" aria-label="Play Party Boy by Sabelle on Spotify">Play on Spotify</a>
                     </div>
                     <meta itemprop="byArtist" content="Sabelle">
                     <meta itemprop="genre" content="Folk">
