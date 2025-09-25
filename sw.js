@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sabellesings-v1';
+const CACHE_NAME = 'sabellesings-v2';
 const ASSETS = [
   '/',
   '/index.html',
