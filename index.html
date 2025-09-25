@@ -61,9 +61,9 @@
             <ul class="nav-links">
                 <li><a href="#vinyl">music</a></li>
                 <li><a href="#tour">tour</a></li>
-                <li><a href="#about">about</a></li>
+                <li><a href="#about">meet the artist</a></li>
                 <li><a href="https://open.spotify.com/artist/5mNeKvVHPf7uVe0VsHsqKL" target="_blank">spotify</a></li>
-                <li><a href="https://www.instagram.com/sabellesings/" target="_blank">instagram</a></li>
+                <li><a href="#youtube">youtube</a></li>
             </ul>
             <div class="mobile-menu" id="mobileMenu">
                 <span></span>
@@ -78,9 +78,9 @@
         <ul class="mobile-nav-links">
             <li><a href="#vinyl">MUSIC</a></li>
             <li><a href="#tour">TOUR</a></li>
-            <li><a href="#about">ABOUT</a></li>
+            <li><a href="#about">MEET THE ARTIST</a></li>
             <li><a href="https://open.spotify.com/artist/5mNeKvVHPf7uVe0VsHsqKL" target="_blank">SPOTIFY</a></li>
-            <li><a href="https://www.instagram.com/sabellesings/" target="_blank">INSTAGRAM</a></li>
+            <li><a href="#youtube">YOUTUBE</a></li>
         </ul>
     </div>
 
@@ -167,12 +167,71 @@
         </div>
     </section>
 
-    <!-- Tour Section -->
-    <section class="tour-section" id="tour" aria-labelledby="tour-title">
+    <!-- YouTube Section -->
+    <section class="youtube-section" id="youtube" aria-labelledby="youtube-title">
+        <div class="section-header">
+            <h2 class="section-title" id="youtube-title">Top Videos</h2>
+        </div>
+        <div class="video-grid">
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/IR8gCRN98ho?rel=0&modestbranding=1" title="High Hopes (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/nEKihbE49w4?rel=0&modestbranding=1" title="The Comedown (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/DK7OEwaWY5c?rel=0&modestbranding=1" title="Twin Flame (Original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/jjFX_zGJBJA?rel=0&modestbranding=1" title="Free spirit (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/RJ0xFmonmVY?rel=0&modestbranding=1" title="Tell Me Your Heart (Official Audio) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/y3-HS2FhE6w?rel=0&modestbranding=1" title="Meant to go that way (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top: 1rem;">
+            <a class="video-link" href="https://www.youtube.com/@Sabellesings/videos" target="_blank" rel="noopener">More on YouTube</a>
+        </div>
+    </section>
+
+    <!-- Upcoming Gigs -->
+    <section class="tour-section" id="tour" aria-labelledby="gigs-title">
         <div class="tour-poster">
             <div class="poster-header">
-                <h2 class="poster-title" id="tour-title">DUSK TO DAWN</h2>
-                <p class="poster-subtitle">Summer Tour 2025</p>
+                <h2 class="poster-title" id="gigs-title">UPCOMING GIGS</h2>
+                <p class="poster-subtitle">Live shows and appearances</p>
+            </div>
+            <div class="tour-dates" id="upcoming-gigs">
+                <div class="tour-date empty-state">
+                    <span class="date-day">TBA</span>
+                    <span class="date-venue">New dates coming soon</span>
+                    <span class="date-city">Follow on YouTube for updates</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Archived Tour Section -->
+    <section class="tour-section" id="tour-archive" aria-labelledby="tour-archive-title">
+        <div class="tour-poster">
+            <div class="poster-header">
+                <h2 class="poster-title" id="tour-archive-title">DUSK TO DAWN</h2>
+                <p class="poster-subtitle">Summer Tour 2025 • Archived</p>
             </div>
             <div class="tour-dates">
                 <div class="tour-date">
@@ -259,10 +318,8 @@
                 </div>
             </div>
             <div class="about-text">
-                <h2 id="about-title">The Story</h2>
-                <p>Born from sunset serenades and golden hour dreams, Sabelle weaves tales of love, wanderlust, and the magic found in between.</p>
-                <p>Each melody is a postcard from the heart, stamped with the warmth of California sun and the whisper of Pacific winds.</p>
-                <p>Join the journey from dusk to dawn, where every song is a memory waiting to be made.</p>
+                <h2 id="about-title">Meet the Artist</h2>
+                <p>Sabelle is a Canadian/American Singer-songwriter based in Monterey, California, known for her soft, resonant sound and poetic lyricism. Drawing inspiration from John Mayer and Kacey Musgraves, and the folk stylings of the ‘60s and ‘70s, her music blends timeless storytelling with a fresh emotional depth. Her original songs are a perfect mix of eclectic soft-pop and country-folk, to bring forth a new, exciting sound to the world of music. Sabelle has been performing all around the Central Coast for the past few years, while growing an active YouTube audience, with over 1,200 subscribers where she posts weekly original compositions and covers.</p>
             </div>
         </div>
     </section>
