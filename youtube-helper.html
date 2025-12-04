@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Helper - Sabelle</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #D4A574, #E8C5A0);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #D4A574;
+            border-radius: 10px;
+            background: #FFF8F0;
+        }
+        
+        .section h2 {
+            color: #8B4513;
+            margin-top: 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #8B4513;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #D4A574;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #D4A574;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background: #B8956A;
+        }
+        
+        .output {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .preview iframe {
+            max-width: 100%;
+            height: 200px;
+        }
+        
+        .instructions {
+            background: #E8F4FD;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .video-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .video-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .video-item input {
+            margin-bottom: 0;
+            margin-right: 10px;
+        }
+        
+        .video-item button {
+            margin-left: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .copy-success {
+            color: green;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Sabelle YouTube Helper</h1>
+        
+        <div class="instructions">
+            <h3>📋 How to Use This Tool:</h3>
+            <ol>
+                <li><strong>Get Video URLs:</strong> Go to your YouTube channel and copy the URLs of your latest videos</li>
+                <li><strong>Add Videos:</strong> Paste each URL below and add a title</li>
+                <li><strong>Generate Code:</strong> Click "Generate HTML Code" to get the embed code</li>
+                <li><strong>Update Website:</strong> Copy the generated code and replace the video section in your index.html</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>📹 Add YouTube Videos</h2>
+            <div id="videoInputs">
+                <div class="video-item">
+                    <input type="text" placeholder="YouTube URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)" class="video-url">
+                    <input type="text" placeholder="Video Title" class="video-title">
+                    <button onclick="removeVideo(this)">Remove</button>
+                </div>
+            </div>
+            <button onclick="addVideoInput()">+ Add Another Video</button>
+            <button onclick="generateHTML()">🚀 Generate HTML Code</button>
+        </div>
+
+        <div class="section">
+            <h2>📋 Generated HTML Code</h2>
+            <p>Copy this code and replace the video-grid section in your index.html file:</p>
+            <textarea id="generatedCode" class="output" readonly placeholder="Generated HTML will appear here..."></textarea>
+            <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            <span id="copySuccess" class="copy-success" style="display: none;">✅ Copied!</span>
+        </div>
+
+        <div class="section">
+            <h2>👀 Preview</h2>
+            <div id="preview" class="preview">
+                <p>Preview will appear here after generating code...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💡 Pro Tips</h2>
+            <ul>
+                <li><strong>Video Order:</strong> The first video will appear first on your website</li>
+                <li><strong>Titles:</strong> Make sure titles match your actual video titles for SEO</li>
+                <li><strong>Regular Updates:</strong> Update your videos monthly or when you release new content</li>
+                <li><strong>Backup:</strong> Keep a copy of your current video list before making changes</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function extractVideoId(url) {
+            // Handle various YouTube URL formats
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+                /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+            ];
+            
+            for (let pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+            return null;
+        }
+
+        function addVideoInput() {
+            const container = document.getElementById('videoInputs');
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item';
+            videoItem.innerHTML = `
+                <input type="text" placeholder="YouTube URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)" class="video-url">
+                <input type="text" placeholder="Video Title" class="video-title">
+                <button onclick="removeVideo(this)">Remove</button>
+            `;
+            container.appendChild(videoItem);
+        }
+
+        function removeVideo(button) {
+            const videoItems = document.querySelectorAll('.video-item');
+            if (videoItems.length > 1) {
+                button.parentElement.remove();
+            } else {
+                alert('You need at least one video!');
+            }
+        }
+
+        function generateHTML() {
+            const videoItems = document.querySelectorAll('.video-item');
+            let html = '        <div class="video-grid">\n';
+            let previewHTML = '';
+            let validVideos = 0;
+
+            videoItems.forEach((item, index) => {
+                const url = item.querySelector('.video-url').value.trim();
+                const title = item.querySelector('.video-title').value.trim();
+                
+                if (url && title) {
+                    const videoId = extractVideoId(url);
+                    if (videoId) {
+                        html += `            <div class="video-card">
+                <div class="video-embed">
+                    <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1" title="${title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>\n`;
+                        
+                        previewHTML += `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1" title="${title}" width="300" height="200" style="margin: 10px;"></iframe>`;
+                        validVideos++;
+                    } else {
+                        alert(`Invalid YouTube URL for video ${index + 1}: ${url}`);
+                        return;
+                    }
+                }
+            });
+
+            html += '        </div>';
+
+            if (validVideos > 0) {
+                document.getElementById('generatedCode').value = html;
+                document.getElementById('preview').innerHTML = previewHTML || '<p>No valid videos to preview</p>';
+            } else {
+                alert('Please add at least one valid video URL and title!');
+            }
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('generatedCode');
+            if (textarea.value.trim() === '') {
+                alert('Please generate HTML code first!');
+                return;
+            }
+            
+            textarea.select();
+            document.execCommand('copy');
+            
+            const successMsg = document.getElementById('copySuccess');
+            successMsg.style.display = 'inline';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 2000);
+        }
+
+        // Load current videos from your website (you can manually add these)
+        window.onload = function() {
+            // Pre-populate with current videos for easy editing
+            const currentVideos = [
+                {url: 'https://www.youtube.com/watch?v=IR8gCRN98ho', title: 'High Hopes (original) - Sabelle'},
+                {url: 'https://www.youtube.com/watch?v=nEKihbE49w4', title: 'The Comedown (original) - Sabelle'},
+                {url: 'https://www.youtube.com/watch?v=DK7OEwaWY5c', title: 'Twin Flame (Original) - Sabelle'},
+                {url: 'https://www.youtube.com/watch?v=jjFX_zGJBJA', title: 'Free spirit (original) - Sabelle'},
+                {url: 'https://www.youtube.com/watch?v=RJ0xFmonmVY', title: 'Tell Me Your Heart (Official Audio) - Sabelle'},
+                {url: 'https://www.youtube.com/watch?v=y3-HS2FhE6w', title: 'Meant to go that way (original) - Sabelle'}
+            ];
+
+            // Clear the default input and add current videos
+            const container = document.getElementById('videoInputs');
+            container.innerHTML = '';
+            
+            // Add current videos
+            currentVideos.forEach((video, index) => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `
+                    <input type="text" placeholder="YouTube URL (e.g., https://www.youtube.com/watch?v=VIDEO_ID)" class="video-url" value="${video.url}">
+                    <input type="text" placeholder="Video Title" class="video-title" value="${video.title}">
+                    <button onclick="removeVideo(this)">Remove</button>
+                `;
+                container.appendChild(videoItem);
+            });
+        };
+    </script>
+</body>
+</html>
