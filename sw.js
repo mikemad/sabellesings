@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sabellesings-v2';
+const CACHE_NAME = 'sabellesings-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -31,18 +31,36 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Network-first for HTML, cache-first for others
+/**
+ * Caching strategies:
+ *   Network-first  → HTML, CSS, JS  (always fresh when online, cache fallback offline)
+ *   Cache-first    → images, fonts, favicons  (rarely change, saves bandwidth)
+ */
+const CACHE_FIRST_EXTENSIONS = /\.(?:png|jpe?g|gif|webp|svg|ico|woff2?|ttf|eot|webmanifest)$/i;
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
   const requestUrl = new URL(request.url);
-  const isSameOrigin = requestUrl.origin === self.location.origin;
-  if (!isSameOrigin) {
-    return;
-  }
+  if (requestUrl.origin !== self.location.origin) return;
 
-  if (request.headers.get('accept')?.includes('text/html')) {
+  // Determine strategy based on file type
+  const useCacheFirst = CACHE_FIRST_EXTENSIONS.test(requestUrl.pathname);
+
+  if (useCacheFirst) {
+    // Cache-first: serve from cache instantly, fetch only on miss
+    event.respondWith(
+      caches.match(request).then((cached) =>
+        cached || fetch(request).then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+      )
+    );
+  } else {
+    // Network-first: always try fresh content, fall back to cache offline
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -52,17 +70,6 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => caches.match(request).then((r) => r || caches.match('/index.html')))
     );
-    return;
   }
-
-  event.respondWith(
-    caches.match(request).then((cached) =>
-      cached || fetch(request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        return response;
-      })
-    )
-  );
 });
 
