@@ -168,42 +168,53 @@
     </section>
 
     <!-- YouTube Section -->
-    <section class="youtube-section" id="youtube" aria-labelledby="youtube-title">
+    <section class="youtube-section" id="youtube" aria-labelledby="youtube-title" data-youtube-handle="@Sabellesings" data-youtube-channel="UC2_f3_-kgw2I8kqVY69rerg" data-youtube-max="6">
         <div class="section-header">
-            <h2 class="section-title" id="youtube-title">Top Videos</h2>
+            <h2 class="section-title" id="youtube-title">Latest Videos</h2>
+            <p class="video-status" data-video-status role="status">Loading the latest uploads…</p>
         </div>
-        <div class="video-grid">
+        <div class="video-grid" data-video-grid aria-live="polite" aria-busy="true"></div>
+        <template id="youtubeFallback">
             <div class="video-card">
                 <div class="video-embed">
-                    <iframe src="https://www.youtube-nocookie.com/embed/KFX7cEAz95A?rel=0&modestbranding=1" title="Something Undefined (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/KFX7cEAz95A?rel=0&modestbranding=1" title="Something Undefined (original) - Sabelle" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
+                <p class="video-title">Something Undefined (original) - Sabelle</p>
             </div>
             <div class="video-card">
                 <div class="video-embed">
-                    <iframe src="https://www.youtube-nocookie.com/embed/muQxnxyX5Pk?rel=0&modestbranding=1" title="Trophies (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/muQxnxyX5Pk?rel=0&modestbranding=1" title="Trophies (original) - Sabelle" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
+                <p class="video-title">Trophies (original) - Sabelle</p>
             </div>
             <div class="video-card">
                 <div class="video-embed">
-                    <iframe src="https://www.youtube-nocookie.com/embed/hTBWcWlqk6c?rel=0&modestbranding=1" title="Butterfly Heartbeat (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/hTBWcWlqk6c?rel=0&modestbranding=1" title="Butterfly Heartbeat (original) - Sabelle" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
+                <p class="video-title">Butterfly Heartbeat (original) - Sabelle</p>
             </div>
             <div class="video-card">
                 <div class="video-embed">
-                    <iframe src="https://www.youtube-nocookie.com/embed/BrbozRJhjIE?rel=0&modestbranding=1" title="I’m Blushin’ (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/BrbozRJhjIE?rel=0&modestbranding=1" title="I’m Blushin’ (original) - Sabelle" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
+                <p class="video-title">I’m Blushin’ (original) - Sabelle</p>
             </div>
             <div class="video-card">
                 <div class="video-embed">
-                    <iframe src="https://www.youtube-nocookie.com/embed/eq6VG0cNVA0?rel=0&modestbranding=1" title="Sold on Your Love (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/eq6VG0cNVA0?rel=0&modestbranding=1" title="Sold on Your Love (original) - Sabelle" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
+                <p class="video-title">Sold on Your Love (original) - Sabelle</p>
             </div>
             <div class="video-card">
                 <div class="video-embed">
-                    <iframe src="https://www.youtube-nocookie.com/embed/seWhyXPPfBU?rel=0&modestbranding=1" title="I Wish (original) - Sabelle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <iframe src="https://www.youtube-nocookie.com/embed/seWhyXPPfBU?rel=0&modestbranding=1" title="I Wish (original) - Sabelle" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
+                <p class="video-title">I Wish (original) - Sabelle</p>
             </div>
-        </div>
+        </template>
+        <noscript>
+            <p class="video-status">Enable JavaScript to load the latest uploads automatically or visit the <a href="https://www.youtube.com/@Sabellesings/videos" target="_blank" rel="noopener">YouTube channel</a>.</p>
+        </noscript>
         <div style="text-align:center; margin-top: 1rem;">
             <a class="video-link" href="https://www.youtube.com/@Sabellesings/videos" target="_blank" rel="noopener">More on YouTube</a>
         </div>

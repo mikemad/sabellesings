@@ -712,6 +712,14 @@ nav.scrolled {
     background: linear-gradient(180deg, transparent 0%, rgba(212, 165, 116, 0.05) 50%, transparent 100%) !important;
 }
 
+.video-status {
+    margin-top: 0.5rem !important;
+    font-family: var(--font-mono) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--vintage-brown) !important;
+}
+
 .video-grid {
     max-width: 1200px !important;
     margin: 0 auto !important;
@@ -727,6 +735,40 @@ nav.scrolled {
     box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
     display: flex !important;
     flex-direction: column !important;
+}
+
+.video-card.is-loading {
+    position: relative !important;
+    overflow: hidden !important;
+    min-height: 220px !important;
+}
+
+.video-card.is-loading::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%) !important;
+    animation: shimmer 1.5s infinite !important;
+}
+
+.video-card.is-loading iframe,
+.video-card.is-loading .video-title {
+    opacity: 0 !important;
+}
+
+.video-title {
+    font-family: var(--font-mono) !important;
+    font-size: 0.95rem !important;
+    text-align: center !important;
+    padding: 0.75rem 1rem 1.5rem !important;
+    color: var(--retro-brown) !important;
+}
+
+.video-title small {
+    display: block !important;
+    font-size: 0.78rem !important;
+    color: var(--dusty-rose) !important;
+    margin-top: 0.35rem !important;
 }
 
 .video-embed { 
@@ -750,6 +792,11 @@ nav.scrolled {
     border-radius: 20px !important;
     font-family: var(--font-mono) !important;
     font-weight: 700 !important;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 /* ========== ABOUT SECTION ========== */
