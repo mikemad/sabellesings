@@ -183,7 +183,7 @@ document.querySelectorAll('section').forEach(section => {
             embed.className = 'video-embed';
 
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1`;
+            iframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1&enablejsapi=1&origin=${location.origin}`;
             iframe.title = video.title;
             iframe.loading = 'lazy';
             iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
@@ -256,4 +256,72 @@ document.querySelectorAll('section').forEach(section => {
     };
 
     loadVideos();
+})();
+
+// ── Analytics event tracking ──
+(function initAnalytics() {
+    const ga = typeof gtag === 'function' ? gtag : () => {};
+
+    // Section views – piggyback on existing IntersectionObserver pattern
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                ga('event', 'section_view', { section: entry.target.id || 'unknown' });
+                sectionObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.25 });
+    document.querySelectorAll('section[id]').forEach((s) => sectionObserver.observe(s));
+
+    // Click tracking via event delegation
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a, [role="button"]');
+        if (!link) return;
+
+        // Spotify CTA / play links
+        if (link.matches('.hero-cta, .play-link')) {
+            const track = link.closest('.vinyl-record')?.querySelector('.track-title')?.textContent
+                || link.textContent.trim();
+            ga('event', 'click_spotify', { track_name: track });
+            return;
+        }
+
+        // YouTube channel link
+        if (link.matches('.video-link')) {
+            ga('event', 'click_youtube_channel');
+            return;
+        }
+
+        // Social footer links
+        if (link.matches('.social-links a')) {
+            const platform = link.getAttribute('title') || 'unknown';
+            ga('event', 'click_social', { platform: platform });
+            return;
+        }
+
+        // Nav links (desktop + mobile)
+        if (link.matches('.nav-links a, .mobile-nav-links a')) {
+            const target = link.getAttribute('href')?.replace('#', '') || 'external';
+            ga('event', 'click_nav', { target_section: target });
+            return;
+        }
+
+        // Mobile menu toggle
+        if (link.matches('#mobileMenu') || link.closest('#mobileMenu')) {
+            ga('event', 'toggle_mobile_menu');
+        }
+    });
+
+    // YouTube iframe play detection via postMessage
+    window.addEventListener('message', (e) => {
+        if (!e.data || typeof e.data !== 'string') return;
+        try {
+            const data = JSON.parse(e.data);
+            if (data.event === 'onStateChange' && data.info === 1) {
+                const iframe = document.querySelector(`iframe[src*="${e.origin.replace(/https?:\/\//, '')}"]`);
+                const title = iframe?.title || 'unknown video';
+                ga('event', 'play_video', { video_title: title });
+            }
+        } catch { /* not a YouTube message */ }
+    });
 })();
