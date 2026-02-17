@@ -144,9 +144,10 @@ document.querySelectorAll('section').forEach(section => {
 
     // CORS proxies that preserve raw response content (order = priority)
     const CORS_PROXIES = [
-        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
     ];
+
+    const FETCH_TIMEOUT_MS = 5000;
 
     const setBusy = (busy) => {
         grid.setAttribute('aria-busy', busy ? 'true' : 'false');
@@ -245,16 +246,23 @@ document.querySelectorAll('section').forEach(section => {
      * back through a list of CORS proxy services in order.
      */
     const fetchText = async (url) => {
+        const fetchWithTimeout = (fetchUrl) => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+            return fetch(fetchUrl, { cache: 'no-store', signal: controller.signal })
+                .finally(() => clearTimeout(timer));
+        };
+
         // 1. Try direct fetch (works if CORS headers present or same-origin)
         try {
-            const res = await fetch(url, { cache: 'no-store' });
+            const res = await fetchWithTimeout(url);
             if (res.ok) return await res.text();
         } catch { /* CORS expected — fall through to proxies */ }
 
         // 2. Try each CORS proxy in order
         for (const proxy of CORS_PROXIES) {
             try {
-                const res = await fetch(proxy(url), { cache: 'no-store' });
+                const res = await fetchWithTimeout(proxy(url));
                 if (res.ok) return await res.text();
             } catch { /* try next proxy */ }
         }
