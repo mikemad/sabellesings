@@ -139,17 +139,6 @@ document.querySelectorAll('section').forEach(section => {
 
     const fallbackTemplate = document.getElementById('youtubeFallback');
     const maxVideos = Number(youtubeSection.dataset.youtubeMax) || 6;
-    const handle = youtubeSection.dataset.youtubeHandle?.trim();
-    let channelId = youtubeSection.dataset.youtubeChannel?.trim();
-
-    // CORS proxies that preserve raw response content (order = priority)
-    const CORS_PROXIES = [
-        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-        (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-    ];
-
-    const FETCH_TIMEOUT_MS = 5000;
 
     const setBusy = (busy) => {
         grid.setAttribute('aria-busy', busy ? 'true' : 'false');
@@ -243,74 +232,14 @@ document.querySelectorAll('section').forEach(section => {
         }).filter((video) => Boolean(video.id));
     };
 
-    /**
-     * Fetch text from a URL, trying a direct request first, then falling
-     * back through a list of CORS proxy services in order.
-     */
-    const fetchText = async (url) => {
-        const fetchWithTimeout = (fetchUrl) => {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-            return fetch(fetchUrl, { cache: 'no-store', signal: controller.signal })
-                .finally(() => clearTimeout(timer));
-        };
-
-        // 1. Try direct fetch (works if CORS headers present or same-origin)
-        try {
-            const res = await fetchWithTimeout(url);
-            if (res.ok) return await res.text();
-        } catch { /* CORS expected — fall through to proxies */ }
-
-        // 2. Try each CORS proxy in order
-        for (const proxy of CORS_PROXIES) {
-            try {
-                const res = await fetchWithTimeout(proxy(url));
-                if (res.ok) return await res.text();
-            } catch { /* try next proxy */ }
-        }
-
-        throw new Error(`All fetch strategies failed for ${url}`);
-    };
-
-    /**
-     * Resolve the YouTube channel ID.
-     * Prefers the hardcoded data attribute; falls back to scraping the
-     * handle page through a CORS proxy.
-     */
-    const resolveChannelId = async () => {
-        if (channelId) return channelId;
-        if (!handle) throw new Error('No YouTube handle configured');
-        const normalizedHandle = handle.startsWith('@') ? handle : `@${handle}`;
-        const handleUrl = `https://www.youtube.com/${normalizedHandle}`;
-        const html = await fetchText(handleUrl);
-        const match = html.match(/"channelId":"(UC[^"]+)"/);
-        if (match?.[1]) {
-            channelId = match[1];
-            youtubeSection.dataset.youtubeChannel = channelId;
-            return channelId;
-        }
-        throw new Error('Unable to locate channel ID');
-    };
-
     const loadVideos = async () => {
         try {
             renderSkeletons();
             setStatus('Loading the latest uploads…', { busy: true });
 
-            // 1. Try local feed file (committed by GitHub Actions, no CORS needed)
-            let feed;
-            try {
-                const res = await fetch('youtube-feed.xml', { cache: 'no-store' });
-                if (res.ok) feed = await res.text();
-            } catch { /* local file not available */ }
-
-            // 2. Fall back to fetching from YouTube via CORS proxies
-            if (!feed) {
-                const resolvedChannel = await resolveChannelId();
-                const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${resolvedChannel}`;
-                feed = await fetchText(feedUrl);
-            }
-
+            const res = await fetch('youtube-feed.xml', { cache: 'no-store' });
+            if (!res.ok) throw new Error(`Feed fetch failed: ${res.status}`);
+            const feed = await res.text();
             const videos = parseFeed(feed).slice(0, maxVideos);
 
             if (!videos.length) {
