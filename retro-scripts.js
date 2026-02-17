@@ -144,7 +144,9 @@ document.querySelectorAll('section').forEach(section => {
 
     // CORS proxies that preserve raw response content (order = priority)
     const CORS_PROXIES = [
+        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+        (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
     ];
 
     const FETCH_TIMEOUT_MS = 5000;
@@ -295,9 +297,20 @@ document.querySelectorAll('section').forEach(section => {
             renderSkeletons();
             setStatus('Loading the latest uploads…', { busy: true });
 
-            const resolvedChannel = await resolveChannelId();
-            const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${resolvedChannel}`;
-            const feed = await fetchText(feedUrl);
+            // 1. Try local feed file (committed by GitHub Actions, no CORS needed)
+            let feed;
+            try {
+                const res = await fetch('youtube-feed.xml', { cache: 'no-store' });
+                if (res.ok) feed = await res.text();
+            } catch { /* local file not available */ }
+
+            // 2. Fall back to fetching from YouTube via CORS proxies
+            if (!feed) {
+                const resolvedChannel = await resolveChannelId();
+                const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${resolvedChannel}`;
+                feed = await fetchText(feedUrl);
+            }
+
             const videos = parseFeed(feed).slice(0, maxVideos);
 
             if (!videos.length) {
