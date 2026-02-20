@@ -29,7 +29,7 @@
    <media:description></media:description>
    <media:community>
     <media:starRating count="3" average="5.00" min="1" max="5"/>
-    <media:statistics views="118"/>
+    <media:statistics views="119"/>
    </media:community>
   </media:group>
  </entry>
@@ -52,7 +52,7 @@
    <media:description></media:description>
    <media:community>
     <media:starRating count="10" average="5.00" min="1" max="5"/>
-    <media:statistics views="566"/>
+    <media:statistics views="568"/>
    </media:community>
   </media:group>
  </entry>
@@ -243,7 +243,7 @@ More videos to come! Always open to ideas/suggestions:). Exciting projects on th
 -Sabelle</media:description>
    <media:community>
     <media:starRating count="18" average="5.00" min="1" max="5"/>
-    <media:statistics views="65"/>
+    <media:statistics views="67"/>
    </media:community>
   </media:group>
  </entry>
@@ -318,7 +318,7 @@ If you want to buy me a coffee, and thus further support my artistic aspirations
 More videos to come! Always open to ideas/suggestions:). Exciting projects on the horizon!!
 -Sabelle</media:description>
    <media:community>
-    <media:starRating count="7" average="5.00" min="1" max="5"/>
+    <media:starRating count="8" average="5.00" min="1" max="5"/>
     <media:statistics views="79"/>
    </media:community>
   </media:group>
