@@ -182,19 +182,29 @@ document.querySelectorAll('section').forEach(section => {
             const embed = document.createElement('div');
             embed.className = 'video-embed';
 
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1`;
-            iframe.title = video.title;
-            iframe.loading = 'lazy';
-            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-            iframe.allowFullscreen = true;
+            const thumb = document.createElement('a');
+            thumb.className = 'video-thumb';
+            thumb.href = `https://www.youtube.com/watch?v=${video.id}`;
+            thumb.target = '_blank';
+            thumb.rel = 'noopener';
+            thumb.setAttribute('aria-label', `Play ${video.title}`);
 
-            embed.appendChild(iframe);
+            const img = document.createElement('img');
+            img.src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+            img.alt = video.title;
+            img.loading = 'lazy';
+
+            const playIcon = document.createElement('span');
+            playIcon.className = 'video-play-btn';
+            playIcon.setAttribute('aria-hidden', 'true');
+
+            thumb.appendChild(img);
+            thumb.appendChild(playIcon);
+            embed.appendChild(thumb);
 
             const titleEl = document.createElement('p');
             titleEl.className = 'video-title';
-            titleEl.innerHTML = `${video.title}${video.published ? `<small>${video.published}</small>` : ''}`;
+            titleEl.innerHTML = `<a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" rel="noopener">${video.title}</a>${video.published ? `<small>${video.published}</small>` : ''}`;
 
             card.appendChild(embed);
             card.appendChild(titleEl);

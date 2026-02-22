@@ -773,13 +773,74 @@ nav.scrolled {
 
 .video-embed { 
     aspect-ratio: 16 / 9 !important; 
-    width: 100% !important; 
+    width: 100% !important;
+    position: relative !important;
 }
 .video-embed iframe { 
     width: 100% !important; 
     height: 100% !important; 
     border: 0 !important; 
     display: block !important; 
+}
+
+.video-thumb {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+    padding: 0 !important;
+    background: #000 !important;
+    cursor: pointer !important;
+    display: block !important;
+}
+
+.video-thumb img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: opacity 0.2s !important;
+}
+
+.video-thumb:hover img {
+    opacity: 0.85 !important;
+}
+
+.video-play-btn {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 68px !important;
+    height: 48px !important;
+    background: #ff0000 !important;
+    border-radius: 14px !important;
+    pointer-events: none !important;
+    transition: background 0.2s !important;
+}
+
+.video-play-btn::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 55% !important;
+    transform: translate(-50%, -50%) !important;
+    border-style: solid !important;
+    border-width: 10px 0 10px 18px !important;
+    border-color: transparent transparent transparent #fff !important;
+}
+
+.video-thumb:hover .video-play-btn {
+    background: #cc0000 !important;
+}
+
+.video-title a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+.video-title a:hover {
+    text-decoration: underline !important;
 }
 
 .video-link {
