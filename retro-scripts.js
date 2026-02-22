@@ -183,7 +183,7 @@ document.querySelectorAll('section').forEach(section => {
             embed.className = 'video-embed';
 
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1&enablejsapi=1&origin=${location.origin}`;
+            iframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?rel=0&modestbranding=1`;
             iframe.title = video.title;
             iframe.loading = 'lazy';
             iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
