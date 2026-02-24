@@ -76,8 +76,8 @@ Your smile was my accolade
 This is no joke, its no charade
 I could see this escalate</media:description>
    <media:community>
-    <media:starRating count="25" average="5.00" min="1" max="5"/>
-    <media:statistics views="642"/>
+    <media:starRating count="26" average="5.00" min="1" max="5"/>
+    <media:statistics views="651"/>
    </media:community>
   </media:group>
  </entry>
@@ -123,7 +123,7 @@ I could see this escalate</media:description>
    <media:description></media:description>
    <media:community>
     <media:starRating count="10" average="5.00" min="1" max="5"/>
-    <media:statistics views="576"/>
+    <media:statistics views="578"/>
    </media:community>
   </media:group>
  </entry>
@@ -314,7 +314,7 @@ More videos to come! Always open to ideas/suggestions:). Exciting projects on th
 -Sabelle</media:description>
    <media:community>
     <media:starRating count="18" average="5.00" min="1" max="5"/>
-    <media:statistics views="77"/>
+    <media:statistics views="78"/>
    </media:community>
   </media:group>
  </entry>
