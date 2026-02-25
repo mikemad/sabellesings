@@ -77,7 +77,7 @@ This is no joke, its no charade
 I could see this escalate</media:description>
    <media:community>
     <media:starRating count="26" average="5.00" min="1" max="5"/>
-    <media:statistics views="3144"/>
+    <media:statistics views="3146"/>
    </media:community>
   </media:group>
  </entry>
@@ -99,8 +99,8 @@ I could see this escalate</media:description>
    <media:thumbnail url="https://i3.ytimg.com/vi/nj6-wh10NTY/hqdefault.jpg" width="480" height="360"/>
    <media:description></media:description>
    <media:community>
-    <media:starRating count="6" average="5.00" min="1" max="5"/>
-    <media:statistics views="172"/>
+    <media:starRating count="7" average="5.00" min="1" max="5"/>
+    <media:statistics views="174"/>
    </media:community>
   </media:group>
  </entry>
@@ -122,8 +122,8 @@ I could see this escalate</media:description>
    <media:thumbnail url="https://i1.ytimg.com/vi/lPDGASTMqgg/hqdefault.jpg" width="480" height="360"/>
    <media:description></media:description>
    <media:community>
-    <media:starRating count="10" average="5.00" min="1" max="5"/>
-    <media:statistics views="578"/>
+    <media:starRating count="11" average="5.00" min="1" max="5"/>
+    <media:statistics views="583"/>
    </media:community>
   </media:group>
  </entry>
