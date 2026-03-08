@@ -76,8 +76,8 @@ Your smile was my accolade
 This is no joke, its no charade
 I could see this escalate</media:description>
    <media:community>
-    <media:starRating count="40" average="5.00" min="1" max="5"/>
-    <media:statistics views="17392"/>
+    <media:starRating count="41" average="5.00" min="1" max="5"/>
+    <media:statistics views="17423"/>
    </media:community>
   </media:group>
  </entry>
@@ -146,7 +146,7 @@ I could see this escalate</media:description>
    <media:description></media:description>
    <media:community>
     <media:starRating count="11" average="5.00" min="1" max="5"/>
-    <media:statistics views="1031"/>
+    <media:statistics views="1032"/>
    </media:community>
   </media:group>
  </entry>
@@ -161,7 +161,7 @@ I could see this escalate</media:description>
    <uri>https://www.youtube.com/channel/UC2_f3_-kgw2I8kqVY69rerg</uri>
   </author>
   <published>2026-02-03T19:35:44+00:00</published>
-  <updated>2026-02-03T19:42:54+00:00</updated>
+  <updated>2026-03-06T20:35:48+00:00</updated>
   <media:group>
    <media:title>Musician teasing a music video???!</media:title>
    <media:content url="https://www.youtube.com/v/6OgEQdbOw4k?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
@@ -169,7 +169,7 @@ I could see this escalate</media:description>
    <media:description></media:description>
    <media:community>
     <media:starRating count="32" average="5.00" min="1" max="5"/>
-    <media:statistics views="1065"/>
+    <media:statistics views="1066"/>
    </media:community>
   </media:group>
  </entry>
@@ -314,7 +314,7 @@ More videos to come! Always open to ideas/suggestions:). Exciting projects on th
 -Sabelle</media:description>
    <media:community>
     <media:starRating count="18" average="5.00" min="1" max="5"/>
-    <media:statistics views="88"/>
+    <media:statistics views="89"/>
    </media:community>
   </media:group>
  </entry>
