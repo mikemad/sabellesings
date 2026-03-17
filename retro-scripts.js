@@ -224,33 +224,18 @@ document.querySelectorAll('section').forEach(section => {
         }
     };
 
-    const parseFeed = (xmlString) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xmlString, 'text/xml');
-        if (doc.querySelector('parsererror')) {
-            throw new Error('Invalid feed format');
-        }
-        return Array.from(doc.querySelectorAll('entry')).map((entry) => {
-            const id = entry.querySelector('yt\\:videoId, videoId')?.textContent?.trim();
-            const title = entry.querySelector('title')?.textContent?.trim() || 'Untitled video';
-            const publishedRaw = entry.querySelector('published')?.textContent?.trim() || '';
-            return {
-                id,
-                title,
-                published: formatDate(publishedRaw)
-            };
-        }).filter((video) => Boolean(video.id));
-    };
-
     const loadVideos = async () => {
         try {
             renderSkeletons();
             setStatus('Loading the latest uploads…', { busy: true });
 
-            const res = await fetch('youtube-feed.xml', { cache: 'no-store' });
+            const res = await fetch('youtube-videos.json', { cache: 'no-store' });
             if (!res.ok) throw new Error(`Feed fetch failed: ${res.status}`);
-            const feed = await res.text();
-            const videos = parseFeed(feed).slice(0, maxVideos);
+            const data = await res.json();
+            const videos = (data.videos || [])
+                .filter((v) => v.id)
+                .map((v) => ({ ...v, published: formatDate(v.published) }))
+                .slice(0, maxVideos);
 
             if (!videos.length) {
                 throw new Error('Feed is empty');
@@ -333,5 +318,30 @@ document.querySelectorAll('section').forEach(section => {
                 ga('event', 'play_video', { video_title: title });
             }
         } catch { /* not a YouTube message */ }
+    });
+})();
+
+// ── Spotify deep-link helper ──────────────────────────────────────────────
+// Tries to open the Spotify app via the spotify: URI scheme.
+// Falls back to the web URL if the app isn't installed / doesn't respond.
+(function initSpotifyLinks() {
+    document.querySelectorAll('a[data-spotify-track]').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const trackId = link.dataset.spotifyTrack;
+            const webUrl  = `https://open.spotify.com/track/${trackId}`;
+            const appUrl  = `spotify:track:${trackId}`;
+
+            // Attempt app open; if tab stays visible after 700 ms the app
+            // didn't catch it, so we fall back to the web player.
+            const t0 = Date.now();
+            window.location.href = appUrl;
+            setTimeout(() => {
+                // Only redirect if we're still on the page (app didn't take over)
+                if (document.hasFocus() && Date.now() - t0 < 2000) {
+                    window.open(webUrl, '_blank', 'noopener');
+                }
+            }, 700);
+        });
     });
 })();

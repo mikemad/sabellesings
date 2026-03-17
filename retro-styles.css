@@ -698,6 +698,11 @@ nav.scrolled {
     color: var(--dusty-rose);
 }
 
+.date-city a {
+    color: inherit;
+    text-decoration: underline;
+}
+
 /* Upcoming gigs empty state */
 .tour-date.empty-state {
     background: rgba(125, 139, 95, 0.12);

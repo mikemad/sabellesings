@@ -17,22 +17,68 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch YouTube RSS feed
+      - name: Install yt-dlp
+        run: pip install -q yt-dlp
+
+      - name: Fetch regular videos + Shorts
         run: |
-          curl -sf --max-time 30 \
-            "https://www.youtube.com/feeds/videos.xml?channel_id=UC2_f3_-kgw2I8kqVY69rerg" \
-            -o youtube-feed.xml
+          fetch_tab() {
+            python3 -m yt_dlp \
+              --flat-playlist \
+              --no-warnings \
+              --print-json \
+              --max-downloads "$2" \
+              "$1" \
+              2>/dev/null
+          }
+
+          # 8 regular videos (Videos tab = no Shorts)
+          fetch_tab "https://www.youtube.com/channel/UC2_f3_-kgw2I8kqVY69rerg/videos" 8 > /tmp/regular.jsonl
+          # 4 most recent Shorts
+          fetch_tab "https://www.youtube.com/channel/UC2_f3_-kgw2I8kqVY69rerg/shorts" 4 > /tmp/shorts.jsonl
+
+          python3 -c "
+          import json, sys
+
+          def parse(path, kind):
+              videos = []
+              with open(path) as f:
+                  for line in f:
+                      line = line.strip()
+                      if not line:
+                          continue
+                      try:
+                          v = json.loads(line)
+                          upload = v.get('upload_date', '')
+                          iso = f'{upload[:4]}-{upload[4:6]}-{upload[6:]}T00:00:00+00:00' if len(upload) == 8 else ''
+                          videos.append({
+                              'id': v.get('id', ''),
+                              'title': v.get('title', ''),
+                              'published': iso,
+                              'kind': kind
+                          })
+                      except Exception:
+                          pass
+              return videos
+
+          regular = parse('/tmp/regular.jsonl', 'video')
+          shorts  = parse('/tmp/shorts.jsonl',  'short')
+
+          # Regular videos first, then Shorts
+          combined = regular + shorts
+          print(json.dumps({'videos': combined}, indent=2))
+          " > youtube-videos.json
 
       - name: Commit and push if changed
         id: commit
         run: |
-          git add youtube-feed.xml
+          git add youtube-videos.json
           if git diff --staged --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git commit -m "Update YouTube feed"
+            git commit -m "Update YouTube videos feed"
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
