@@ -709,6 +709,31 @@ nav.scrolled {
     border: 2px dashed var(--retro-green);
 }
 
+/* Upcoming gigs carry a set time, so they get a fourth column */
+#upcoming-gigs .tour-date {
+    grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
+}
+
+#upcoming-gigs .date-city {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.date-time {
+    text-align: right;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--retro-green);
+}
+
+.gigs-note {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--vintage-brown);
+}
+
 /* YouTube Section */
 .youtube-section {
     padding: 6rem 3rem !important;
@@ -1146,10 +1171,17 @@ footer {
         font-size: 2.5rem;
     }
 
-    .tour-date {
+    .tour-date,
+    #upcoming-gigs .tour-date {
         grid-template-columns: 1fr;
         text-align: center;
         gap: 0.5rem;
+    }
+
+    #upcoming-gigs .date-city,
+    .date-city,
+    .date-time {
+        text-align: center;
     }
 
     .about-container {
