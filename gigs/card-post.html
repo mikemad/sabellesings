@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Sabelle — Upcoming Gigs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Kalam:wght@300;400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --golden-hour:#D4A574; --sunset-orange:#E89F71; --dusty-rose:#C08B7C;
+  --warm-cream:#FAF3E8; --deep-amber:#B67E5C; --vintage-brown:#6B4E3D;
+  --soft-peach:#FFE4D6; --retro-green:#7D8B5F;
+}
+html,body{ background:#fff; }
+body{ display:flex; align-items:center; justify-content:center; }
+.card{
+  position:relative; overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,228,214,.85), transparent 42%),
+    radial-gradient(circle at 84% 8%,  rgba(232,159,113,.30), transparent 38%),
+    radial-gradient(circle at 50% 108%, rgba(212,165,116,.45), transparent 55%),
+    var(--warm-cream);
+  display:flex; flex-direction:column;
+}
+/* sun rays behind the header */
+.card::before{
+  content:""; position:absolute; top:-38%; left:50%; width:150%; aspect-ratio:1;
+  transform:translateX(-50%);
+  background:repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(232,159,113,.16) 0deg 7deg, transparent 7deg 14deg);
+  opacity:.7; pointer-events:none;
+}
+/* paper grain */
+.card::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.05;
+  background-image:radial-gradient(#6B4E3D 1px, transparent 1px);
+  background-size:5px 5px;
+}
+.inner{
+  position:relative; z-index:2; flex:1; display:flex; flex-direction:column;
+  margin:var(--frame); border:3px solid var(--vintage-brown); border-radius:26px;
+  padding:var(--pad);
+}
+.inner::before{
+  content:""; position:absolute; inset:14px; border:2px dashed var(--deep-amber);
+  border-radius:16px; opacity:.55; pointer-events:none;
+}
+.head{ text-align:center; }
+.name{
+  font-family:'Bebas Neue',sans-serif; letter-spacing:.06em; line-height:.92;
+  font-size:var(--name-size); color:var(--sunset-orange);
+  text-shadow:5px 5px 0 var(--deep-amber), 10px 10px 0 rgba(107,78,61,.18);
+}
+.tag{
+  font-family:'Kalam',cursive; color:var(--dusty-rose);
+  font-size:var(--tag-size); margin-top:.35em;
+}
+.rule{
+  display:flex; align-items:center; gap:18px; margin:var(--rule-gap) 0;
+  color:var(--golden-hour);
+}
+.rule span{ flex:1; height:2px; background:currentColor; opacity:.5; }
+.rule b{ font-size:calc(var(--tag-size) * .9); }
+.title{
+  font-family:'Bebas Neue',sans-serif; text-align:center; color:var(--vintage-brown);
+  font-size:var(--title-size); letter-spacing:.08em; line-height:1;
+}
+.month{
+  font-family:'Space Mono',monospace; text-align:center; color:var(--deep-amber);
+  font-size:var(--month-size); letter-spacing:.3em; margin-top:.5em; font-weight:700;
+}
+/* One shared set of columns so every row's venue starts at the same x. */
+.gigs{
+  list-style:none; margin-top:var(--list-top); flex:1;
+  display:grid; grid-template-columns:max-content 1fr max-content;
+  align-content:center; row-gap:var(--row-gap);
+}
+.gig{
+  grid-column:1 / -1; display:grid; grid-template-columns:subgrid;
+  gap:var(--col-gap); align-items:center;
+  padding:var(--row-pad) calc(var(--row-pad) * .9);
+  border-radius:14px; background:rgba(212,165,116,.13);
+}
+.gig:nth-child(even){ background:rgba(125,139,95,.10); }
+.g-date{
+  font-family:'Bebas Neue',sans-serif; color:var(--deep-amber);
+  font-size:var(--date-size); letter-spacing:.05em; white-space:nowrap;
+}
+.g-mid{ display:flex; flex-direction:column; min-width:0; }
+.g-venue{
+  font-family:'Space Mono',monospace; font-weight:700; color:var(--vintage-brown);
+  font-size:var(--venue-size); line-height:1.25;
+}
+.g-city{
+  font-family:'Space Mono',monospace; color:var(--dusty-rose);
+  font-size:var(--city-size); margin-top:.15em;
+}
+.g-time{
+  font-family:'Space Mono',monospace; font-weight:700; color:var(--retro-green);
+  font-size:var(--time-size); white-space:nowrap; text-align:right;
+}
+.more{
+  grid-column:1 / -1; text-align:center; padding-top:.35em;
+  font-family:'Space Mono',monospace; font-style:italic;
+  color:var(--deep-amber); font-size:var(--city-size); letter-spacing:.05em;
+}
+.empty{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; text-align:center; gap:.6em;
+  font-family:'Space Mono',monospace; color:var(--vintage-brown);
+  font-size:var(--venue-size);
+}
+.foot{
+  margin-top:var(--foot-top); text-align:center;
+  font-family:'Space Mono',monospace; color:var(--vintage-brown);
+}
+.handle{ font-size:var(--handle-size); font-weight:700; color:var(--deep-amber); letter-spacing:.12em; }
+.site{ font-size:var(--site-size); color:var(--dusty-rose); margin-top:.45em; letter-spacing:.22em; }
+.petals{ position:absolute; z-index:3; color:var(--golden-hour); opacity:.5; }
+.p1{ top:3.2%; left:5%;  font-size:var(--petal); transform:rotate(-12deg); }
+.p2{ bottom:3.2%; right:5.5%; font-size:var(--petal); transform:rotate(14deg); }
+
+.card{ width:1080px; height:1350px;
+  --frame:30px; --pad:46px; --name-size:118px; --tag-size:31px; --rule-gap:18px;
+  --title-size:62px; --month-size:22px; --list-top:24px; --col-gap:24px;
+  --row-pad:17px; --row-gap:12px; --date-size:42px; --venue-size:25px;
+  --city-size:19px; --time-size:23px; --foot-top:22px; --handle-size:28px;
+  --site-size:18px; --petal:46px; }
+</style>
+</head><body>
+  <div class="card">
+    <div class="petals p1">✿</div>
+    <div class="petals p2">☼</div>
+    <div class="inner">
+      <div class="head">
+        <div class="name">SABELLE</div>
+        <div class="tag">where sunset meets soul</div>
+      </div>
+      <div class="rule"><span></span><b>✷</b><span></span></div>
+      <div class="title">UPCOMING GIGS</div>
+      <div class="month">JULY 2026</div>
+      <ul class="gigs">
+        <li class="gig"><span class="g-date">JUL 9</span><span class="g-mid"><span class="g-venue">The Lodge at Pebble Beach</span><span class="g-city">Pebble Beach, CA</span></span><span class="g-time">5–8PM</span></li>
+        <li class="gig"><span class="g-date">JUL 10</span><span class="g-mid"><span class="g-venue">Taste of Monterey</span><span class="g-city">Monterey, CA</span></span><span class="g-time">5–7PM</span></li>
+        <li class="gig"><span class="g-date">JUL 11</span><span class="g-mid"><span class="g-venue">The Lodge at Pebble Beach</span><span class="g-city">Pebble Beach, CA</span></span><span class="g-time">5–8PM</span></li>
+        <li class="gig"><span class="g-date">JUL 24</span><span class="g-mid"><span class="g-venue">Edgar’s at the Quail Lodge</span><span class="g-city">Carmel, CA</span></span><span class="g-time">5:30–8:30PM</span></li>
+        <li class="gig"><span class="g-date">JUL 25</span><span class="g-mid"><span class="g-venue">Taste Morgan at Carmel Crossroads</span><span class="g-city">Carmel, CA</span></span><span class="g-time">3–5PM</span></li>
+        <li class="gig"><span class="g-date">JUL 31</span><span class="g-mid"><span class="g-venue">Carmel Valley Athletic Club</span><span class="g-city">Carmel Valley, CA</span></span><span class="g-time">5–7PM</span></li>
+      </ul>
+      <div class="foot">
+        <div class="handle">@sabellesings</div>
+        <div class="site">sabellesings.com</div>
+      </div>
+    </div>
+  </div>
+</body></html>

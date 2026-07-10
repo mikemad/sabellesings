@@ -1,0 +1,41 @@
+{
+  "_comment": "Generated from the Upcoming Gigs Google Sheet by .github/workflows/sync-gigs.yml. Edit the sheet, not this file.",
+  "gigs": [
+    {
+      "date": "2026-07-09",
+      "venue": "The Lodge at Pebble Beach",
+      "city": "Pebble Beach, CA",
+      "time": "5–8PM"
+    },
+    {
+      "date": "2026-07-10",
+      "venue": "Taste of Monterey",
+      "city": "Monterey, CA",
+      "time": "5–7PM"
+    },
+    {
+      "date": "2026-07-11",
+      "venue": "The Lodge at Pebble Beach",
+      "city": "Pebble Beach, CA",
+      "time": "5–8PM"
+    },
+    {
+      "date": "2026-07-24",
+      "venue": "Edgar’s at the Quail Lodge",
+      "city": "Carmel, CA",
+      "time": "5:30–8:30PM"
+    },
+    {
+      "date": "2026-07-25",
+      "venue": "Taste Morgan at Carmel Crossroads",
+      "city": "Carmel, CA",
+      "time": "3–5PM"
+    },
+    {
+      "date": "2026-07-31",
+      "venue": "Carmel Valley Athletic Club",
+      "city": "Carmel Valley, CA",
+      "time": "5–7PM"
+    }
+  ]
+}

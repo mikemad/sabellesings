@@ -714,9 +714,32 @@ nav.scrolled {
     grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
 }
 
+/* Each row is its own grid, so tracks don't line up row to row. Subgrid lets
+   every row share one set of columns. */
+@supports (grid-template-columns: subgrid) {
+    #upcoming-gigs {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
+    }
+
+    #upcoming-gigs .tour-date {
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+    }
+
+    #upcoming-gigs .tour-date.empty-state {
+        grid-template-columns: 1fr;
+    }
+}
+
 #upcoming-gigs .date-city {
     text-align: left;
     white-space: nowrap;
+}
+
+#upcoming-gigs .tour-date.empty-state {
+    grid-template-columns: 1fr;
+    text-align: center;
 }
 
 .date-time {
@@ -1171,8 +1194,13 @@ footer {
         font-size: 2.5rem;
     }
 
+    #upcoming-gigs {
+        display: block;
+    }
+
     .tour-date,
     #upcoming-gigs .tour-date {
+        grid-column: auto;
         grid-template-columns: 1fr;
         text-align: center;
         gap: 0.5rem;

@@ -1,0 +1,111 @@
+name: Sync Gigs
+
+# Sabelle edits the Upcoming Gigs Google Sheet; this pulls it in, rewrites the
+# site's gig list, regenerates the shareable graphics, and deploys. It also runs
+# on a schedule with no sheet change, which is what drops shows once they pass.
+#
+# Setup: publish the sheet (File > Share > Publish to web > CSV) and save the
+# link as a repository variable named GIGS_SHEET_CSV_URL.
+# See GIGS.md for the full walkthrough.
+
+on:
+  schedule:
+    # Every 6 hours, offset so it doesn't collide with the YouTube feed job.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync-gigs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull the gig sheet into gigs.json
+        env:
+          GIGS_SHEET_CSV_URL: ${{ vars.GIGS_SHEET_CSV_URL }}
+        run: |
+          set +e
+          python3 scripts/sync_gigs.py
+          code=$?
+          set -e
+          case "$code" in
+            0) ;;
+            1) echo "::warning::Sheet unavailable or unusable. Keeping the gigs.json already in the repo." ;;
+            2) echo "::warning::Some sheet rows were skipped -- see the log above. Good rows were published." ;;
+            *) echo "::error::sync_gigs.py failed with exit $code"; exit 1 ;;
+          esac
+
+      - name: Render the website and the cards
+        run: |
+          python3 scripts/render_gigs.py
+          python3 scripts/render_gig_card.py
+
+      # Screenshotting is slow and produces binary churn, so only do it when the
+      # data or the card markup actually changed.
+      - name: Did anything change?
+        id: changed
+        run: |
+          if git diff --quiet -- gigs.json index.html gigs/card-post.html gigs/card-story.html gigs/index.html; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing changed; skipping screenshots."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Chrome ships on the GitHub runner image, but don't bet the job on it.
+      - name: Resolve Chrome
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || true)"
+          if [ -z "$CHROME" ]; then
+            echo "Chrome not on the runner; installing."
+            wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ./google-chrome-stable_current_amd64.deb
+            CHROME="$(command -v google-chrome)"
+          fi
+          echo "CHROME=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Screenshot the graphics
+        if: steps.changed.outputs.changed == 'true'
+        run: python3 scripts/shoot_cards.py "$CHROME"
+
+      - name: Check the graphics aren't clipped
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          set +e
+          python3 scripts/check_cards.py "$CHROME"
+          code=$?
+          set -e
+          case "$code" in
+            0) ;;
+            2) echo "::warning::A venue name wrapped onto two lines. The card still works." ;;
+            *) echo "::error::The generated card is broken (clipped or overflowing)."; exit 1 ;;
+          esac
+
+      - name: Commit and push if changed
+        id: commit
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          git add gigs.json index.html gigs/
+          if git diff --staged --quiet; then
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "Update gig dates and graphics"
+            git push
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger deploy
+        if: steps.commit.outputs.pushed == 'true'
+        run: gh workflow run "Deploy static content to Pages" --ref main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
