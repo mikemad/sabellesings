@@ -82,6 +82,11 @@ def _safe_date(y, mo, d):
         return None
 
 
+def smarten(s):
+    """Sheets give us "Edgar's"; the site sets it as "Edgar’s"."""
+    return re.sub(r"(?<=\w)'(?=\w)", "’", s)
+
+
 def pick(row, *names):
     """Fetch a column by any of several header spellings."""
     for n in names:
@@ -140,8 +145,8 @@ def main():
         gigs.append(
             {
                 "date": parsed.isoformat(),
-                "venue": venue,
-                "city": city,
+                "venue": smarten(venue),
+                "city": smarten(city),
                 "time": pretty_time or "",
             }
         )
