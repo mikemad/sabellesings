@@ -36,6 +36,36 @@
       "venue": "Carmel Valley Athletic Club",
       "city": "Carmel Valley, CA",
       "time": "5–7PM"
+    },
+    {
+      "date": "2026-08-12",
+      "venue": "Monterey Plaza Hotel",
+      "city": "Monterey, CA",
+      "time": "6–10PM"
+    },
+    {
+      "date": "2026-08-18",
+      "venue": "Monterey Plaza Hotel",
+      "city": "Monterey, CA",
+      "time": "6–10PM"
+    },
+    {
+      "date": "2026-08-21",
+      "venue": "Hyatt Monterey",
+      "city": "Monterey, CA",
+      "time": "7–10PM"
+    },
+    {
+      "date": "2026-08-22",
+      "venue": "Camp Carmel Valley",
+      "city": "Carmel Valley, CA",
+      "time": "6–8PM"
+    },
+    {
+      "date": "2026-08-28",
+      "venue": "Carmel Valley Athletic Club (CVAC)",
+      "city": "Carmel Valley, CA",
+      "time": "5–7PM"
     }
   ]
 }
