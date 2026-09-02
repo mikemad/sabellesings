@@ -7,6 +7,7 @@ into PNGs, so the graphic is regenerated from the same data the site renders --
 the poster can never disagree with the website.
 """
 
+import hashlib
 import html
 import json
 import os
@@ -390,7 +391,7 @@ def plain_line(gig):
     return line
 
 
-def landing_html(gigs, theme):
+def landing_html(gigs, theme, asset_v):
     if gigs:
         items = "\n".join(
             f"      <li><b>{esc(short_day(g))}</b> — {esc(plain_line(g).split(' — ', 1)[1])}</li>"
@@ -439,13 +440,13 @@ def landing_html(gigs, theme):
   <div class="cards">
     <div class="col">
       <h2>Instagram Post — 1080×1350</h2>
-      <img src="gig-card.png" alt="Sabelle upcoming gigs poster">
-      <a class="btn" href="gig-card.png" download>Download post</a>
+      <img src="gig-card.png?v={asset_v}" alt="Sabelle upcoming gigs poster">
+      <a class="btn" href="gig-card.png?v={asset_v}" download>Download post</a>
     </div>
     <div class="col">
       <h2>Story — 1080×1920</h2>
-      <img src="gig-card-story.png" alt="Sabelle upcoming gigs story graphic">
-      <a class="btn" href="gig-card-story.png" download>Download story</a>
+      <img src="gig-card-story.png?v={asset_v}" alt="Sabelle upcoming gigs story graphic">
+      <a class="btn" href="gig-card-story.png?v={asset_v}" download>Download story</a>
     </div>
   </div>
 
@@ -483,11 +484,21 @@ def main():
     theme = theme_for(gigs)
 
     os.makedirs(OUT_DIR, exist_ok=True)
+    built = []
     for name, story in (("card-post.html", False), ("card-story.html", True)):
+        markup = card_html(gigs, theme, story=story)
+        built.append(markup)
         with open(os.path.join(OUT_DIR, name), "w", encoding="utf-8") as f:
-            f.write(card_html(gigs, theme, story=story))
+            f.write(markup)
+
+    # GitHub Pages serves the PNGs with max-age=14400 and the filenames never
+    # change, so a browser that has seen last month's poster keeps showing it
+    # for four hours. Fingerprint the link with a digest of the markup the
+    # screenshots are taken from: same poster, same URL; new poster, new URL.
+    asset_v = hashlib.sha1("".join(built).encode("utf-8")).hexdigest()[:8]
+
     with open(os.path.join(OUT_DIR, "index.html"), "w", encoding="utf-8") as f:
-        f.write(landing_html(gigs, theme))
+        f.write(landing_html(gigs, theme, asset_v))
 
     print(f"Built gig cards for {len(gigs)} upcoming gig(s) in {theme['name']}.")
     return 0

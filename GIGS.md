@@ -68,6 +68,13 @@ Both are on **https://sabellesings.com/gigs/**, along with download buttons and
 a plain-text caption to copy. That page is `noindex`, so it won't show up in
 search results — it's just for her.
 
+The page links the posters with a fingerprint in the URL
+(`gig-card.png?v=c239e19e`) that changes whenever the poster does. GitHub Pages
+serves images with a four-hour cache and the filenames never change, so without
+it a browser that had seen last month's poster would keep showing it. If she
+ever saves a poster straight from the image URL and it looks stale, that is
+what the `?v=` is for — reload `/gigs/` and use the buttons.
+
 When there are more than 8 shows, the post shows the first 8 and adds
 "+N more dates at sabellesings.com" rather than shrinking the text to nothing.
 The `/gigs/` page always lists every date.
