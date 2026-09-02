@@ -1,5 +1,5 @@
 {
-  "_comment": "Generated from the Upcoming Gigs Google Sheet by .github/workflows/sync-gigs.yml. Edit the sheet, not this file.",
+  "_comment": "Generated from the Upcoming Gigs Google Sheet by .github/workflows/sync-gigs.yml. Edit the sheet, not this file. Shows whose date has passed are kept here as the site's archive even once they leave the sheet.",
   "gigs": [
     {
       "date": "2026-07-09",
@@ -66,6 +66,60 @@
       "venue": "Carmel Valley Athletic Club (CVAC)",
       "city": "Carmel Valley, CA",
       "time": "5–7PM"
+    },
+    {
+      "date": "2026-09-04",
+      "venue": "Corral De Tierra",
+      "city": "Corral De Tierra, CA",
+      "time": "5:30–8:30PM"
+    },
+    {
+      "date": "2026-09-05",
+      "venue": "The Camp at Carmel Valley",
+      "city": "Carmel Valley, CA",
+      "time": "6–8PM"
+    },
+    {
+      "date": "2026-09-08",
+      "venue": "Monterey Plaza Hotel",
+      "city": "Monterey, CA",
+      "time": "6–10PM"
+    },
+    {
+      "date": "2026-09-11",
+      "venue": "Taste of Monterey",
+      "city": "Monterey, CA",
+      "time": "5–7PM"
+    },
+    {
+      "date": "2026-09-13",
+      "venue": "McIntyre Family Wines Tasting Room",
+      "city": "Carmel Valley, CA",
+      "time": "1–4PM"
+    },
+    {
+      "date": "2026-09-18",
+      "venue": "Pasadera Summer Concert Series",
+      "city": "Monterey, CA",
+      "time": "5–8PM"
+    },
+    {
+      "date": "2026-09-19",
+      "venue": "Taste of Monterey",
+      "city": "Monterey, CA",
+      "time": "5–7PM"
+    },
+    {
+      "date": "2026-09-25",
+      "venue": "Terrace Hour at Sunset Center",
+      "city": "Carmel, CA",
+      "time": "6–7PM"
+    },
+    {
+      "date": "2026-09-26",
+      "venue": "The Lodge",
+      "city": "Pebble Beach, CA",
+      "time": "5–8PM"
     }
   ]
 }
