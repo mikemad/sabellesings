@@ -212,10 +212,6 @@ body{ display:flex; align-items:center; justify-content:center; }
   font-size:var(--name-size); color:var(--accent);
   text-shadow:5px 5px 0 var(--accent-deep), 10px 10px 0 var(--ink-18);
 }
-.tag{
-  font-family:'Kalam',cursive; color:var(--soft);
-  font-size:var(--tag-size); margin-top:.35em;
-}
 .rule{
   display:flex; align-items:center; gap:18px; margin:var(--rule-gap) 0;
   color:var(--warm);
@@ -364,7 +360,6 @@ def card_html(gigs, theme, story=False):
     <div class="inner">
       <div class="head">
         <div class="name">SABELLE</div>
-        <div class="tag">where sunset meets soul</div>
       </div>
       <div class="rule"><span></span><b>✷</b><span></span></div>
       <div class="title">UPCOMING GIGS</div>
