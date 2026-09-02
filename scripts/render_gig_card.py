@@ -201,6 +201,12 @@ body{ display:flex; align-items:center; justify-content:center; }
   position:relative; z-index:2; flex:1; display:flex; flex-direction:column;
   margin:var(--frame); border:3px solid var(--ink); border-radius:26px;
   padding:var(--pad);
+  /* A flex child defaults to min-height:auto, so tall content shoves the panel
+     past the bottom of the card and the card's overflow:hidden slices the
+     border and the dashed inset off. Pin it to the space it was given: the
+     frame then cannot be clipped, and anything that genuinely does not fit
+     gets caught by check_cards.py instead of quietly losing the border. */
+  min-height:0; overflow:hidden;
 }
 .inner::before{
   content:""; position:absolute; inset:14px; border:2px dashed var(--accent-deep);
@@ -228,7 +234,7 @@ body{ display:flex; align-items:center; justify-content:center; }
 }
 /* One shared set of columns so every row's venue starts at the same x. */
 .gigs{
-  list-style:none; margin-top:var(--list-top); flex:1;
+  list-style:none; margin-top:var(--list-top); flex:1; min-height:0;
   display:grid; grid-template-columns:max-content 1fr max-content;
   align-content:center; row-gap:var(--row-gap);
 }
@@ -308,23 +314,24 @@ ROW_VARS = {
     "row-gap": (12, 18),
 }
 
-# All three numbers below were measured in headless Chrome by rendering each row
-# count at descending scales and taking the largest that did not clip the
-# footer -- not guessed. check_cards.py re-checks the result on every build.
+# Measured in headless Chrome by rendering each row count at descending scales
+# and taking the largest where every row stayed inside the list area. An earlier
+# pass used "is the footer still inside the card", which is far too lax -- the
+# panel simply grew and took its border off the bottom of the card. check_cards.py
+# now enforces the strict version on every build.
 #
 # Rows that fit at full size:
-FULL_SIZE_ROWS = {False: 8, True: 9}  # keyed by is_story
+FULL_SIZE_ROWS = {False: 7, True: 9}  # keyed by is_story
 
-# Row height came out very nearly proportional to the scale, so rows * scale is
-# close to constant. Measured 7.84-8.10 across 9..14 rows for the post and
-# 9.60-9.92 across 10..20 for the story; these sit just under the tightest of
-# each, leaving margin for a font or browser update moving the metrics.
-FIT_BUDGET = {False: 7.8, True: 9.5}
+# Row height is very nearly proportional to the scale, so rows * scale is close
+# to constant. Measured 7.20-7.38 across 8..15 rows for the post and
+# 9.10-9.36 across 10..16 for the story; each budget sits just under the tightest
+# measurement, leaving margin for a font or browser update moving the metrics.
+FIT_BUDGET = {False: 7.1, True: 9.0}
 
-# The most rows the card can hold at all: 14 rows land at scale 0.56 on the
-# post, 20 at 0.48 on the story. A month only gets sent to the website when it
-# genuinely will not fit, and even then the "+N more" line takes one of these
-# slots rather than being extra.
+# The most rows a card can hold at all. A month only gets sent to the website
+# when it genuinely will not fit, and even then the "+N more" line takes one of
+# these slots rather than being extra.
 MAX_ROWS = {False: 14, True: 20}
 
 

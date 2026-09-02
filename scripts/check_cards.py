@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Assert the generated cards actually look right.
 
-Two things silently ruin the poster: a venue name that wraps to a second line,
-and content that overflows the fixed 1080x1350 / 1080x1920 canvas so the footer
-gets clipped. Both are invisible to a plain screenshot diff, so check them in a
-real browser.
+Three things silently ruin the poster: a venue name that wraps to a second
+line, content taller than the framed panel, and a panel taller than the card so
+its border and dashed inset get sliced off at the bottom. That last one is the
+sneaky one -- the footer text can still be comfortably inside the card while the
+border it sits in has run off the edge. All three are invisible to a plain
+screenshot diff, so check them in a real browser.
 
 A clipped card is broken and must block the build. A wrapped venue is merely
 ugly -- an unusually long venue name should never stop Sabelle's dates from
@@ -36,8 +38,26 @@ addEventListener('load',()=>{setTimeout(()=>{
   const overflow=Math.max(0, Math.ceil(inner.scrollHeight - inner.clientHeight));
   const foot=document.querySelector('.foot').getBoundingClientRect();
   const cardBox=card.getBoundingClientRect();
+  // The panel carries the border and the dashed inset. It is margined off the
+  // card on every side, so its bottom plus that margin has to stay inside.
+  const innerBox=inner.getBoundingClientRect();
+  const frame=parseFloat(getComputedStyle(inner).marginBottom)||0;
+  const framePast=Math.max(0, Math.ceil(innerBox.bottom + frame - cardBox.bottom));
+  // The panel is pinned to the card, so a list that is too tall no longer
+  // pushes the border out -- it spills its own rows instead. The list centres
+  // its content, so a spill goes off both ends and has to be measured on each.
+  const list=document.querySelector('.gigs');
+  let rowsPast=0;
+  if(list){
+    const rows=[...document.querySelectorAll('.gig, .more')];
+    const lb=list.getBoundingClientRect();
+    if(rows.length){
+      rowsPast=Math.ceil(Math.max(0, lb.top-rows[0].getBoundingClientRect().top)
+              + Math.max(0, rows[rows.length-1].getBoundingClientRect().bottom-lb.bottom));
+    }
+  }
   document.title='PROBE '+JSON.stringify({
-    wrapped, overflow,
+    wrapped, overflow, framePast, rowsPast,
     footBottom:Math.ceil(foot.bottom), cardBottom:Math.floor(cardBox.bottom)
   });
 },1500)});
@@ -77,6 +97,15 @@ def main():
 
         if r["overflow"] > 0:
             broken.append(f"{name}: content overflows the card by {r['overflow']}px")
+        if r["framePast"] > 0:
+            broken.append(
+                f"{name}: the framed panel runs {r['framePast']}px past the card, "
+                "so its border is clipped"
+            )
+        if r["rowsPast"] > 0:
+            broken.append(
+                f"{name}: the dates spill {r['rowsPast']}px out of the list area"
+            )
         if r["footBottom"] > r["cardBottom"]:
             broken.append(
                 f"{name}: footer is clipped "
@@ -85,8 +114,13 @@ def main():
         if r["wrapped"]:
             warnings.append(f"{name}: venue name wraps to 2 lines: {r['wrapped']}")
 
-        status = "BROKEN" if r["overflow"] > 0 else ("warn" if r["wrapped"] else "ok")
-        print(f"{status}: {name} overflow={r['overflow']}px wrapped={len(r['wrapped'])}")
+        bad = r["overflow"] > 0 or r["framePast"] > 0 or r["rowsPast"] > 0
+        status = "BROKEN" if bad else ("warn" if r["wrapped"] else "ok")
+        print(
+            f"{status}: {name} overflow={r['overflow']}px "
+            f"framePast={r['framePast']}px rowsPast={r['rowsPast']}px "
+            f"wrapped={len(r['wrapped'])}"
+        )
 
     if broken:
         print("\nBroken:")

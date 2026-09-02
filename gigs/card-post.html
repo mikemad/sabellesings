@@ -35,6 +35,12 @@ body{ display:flex; align-items:center; justify-content:center; }
   position:relative; z-index:2; flex:1; display:flex; flex-direction:column;
   margin:var(--frame); border:3px solid var(--ink); border-radius:26px;
   padding:var(--pad);
+  /* A flex child defaults to min-height:auto, so tall content shoves the panel
+     past the bottom of the card and the card's overflow:hidden slices the
+     border and the dashed inset off. Pin it to the space it was given: the
+     frame then cannot be clipped, and anything that genuinely does not fit
+     gets caught by check_cards.py instead of quietly losing the border. */
+  min-height:0; overflow:hidden;
 }
 .inner::before{
   content:""; position:absolute; inset:14px; border:2px dashed var(--accent-deep);
@@ -62,7 +68,7 @@ body{ display:flex; align-items:center; justify-content:center; }
 }
 /* One shared set of columns so every row's venue starts at the same x. */
 .gigs{
-  list-style:none; margin-top:var(--list-top); flex:1;
+  list-style:none; margin-top:var(--list-top); flex:1; min-height:0;
   display:grid; grid-template-columns:max-content 1fr max-content;
   align-content:center; row-gap:var(--row-gap);
 }
@@ -117,7 +123,7 @@ body{ display:flex; align-items:center; justify-content:center; }
   --row-pad:17px; --row-gap:12px; --date-size:42px; --venue-size:25px;
   --city-size:19px; --time-size:23px; --foot-top:22px; --handle-size:28px;
   --site-size:18px; --petal:46px; }
-.card{ --date-size:36.4px; --venue-size:21.7px; --city-size:16.5px; --time-size:19.9px; --row-pad:14.7px; --row-gap:10.4px; }</style>
+.card{ --date-size:33.1px; --venue-size:19.7px; --city-size:15.0px; --time-size:18.1px; --row-pad:13.4px; --row-gap:9.5px; }</style>
 </head><body>
   <div class="card">
     <div class="petals p1">✿</div>
