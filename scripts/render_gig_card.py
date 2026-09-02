@@ -324,10 +324,12 @@ ROW_VARS = {
 FULL_SIZE_ROWS = {False: 7, True: 9}  # keyed by is_story
 
 # Row height is very nearly proportional to the scale, so rows * scale is close
-# to constant. Measured 7.20-7.38 across 8..15 rows for the post and
-# 9.10-9.36 across 10..16 for the story; each budget sits just under the tightest
-# measurement, leaving margin for a font or browser update moving the metrics.
-FIT_BUDGET = {False: 7.1, True: 9.0}
+# to constant. Measured across the full range each card can hold: 7.20-7.38 for
+# the post (8..15 rows) and 9.00-9.36 for the story (10..20). Each budget sits a
+# clear step under the tightest of those rather than exactly on it, so a font or
+# browser update nudging the metrics cannot tip a card over. Sitting exactly on
+# the measurement is what produced the clipped border in the first place.
+FIT_BUDGET = {False: 7.0, True: 8.8}
 
 # The most rows a card can hold at all. A month only gets sent to the website
 # when it genuinely will not fit, and even then the "+N more" line takes one of
