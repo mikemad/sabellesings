@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sabellesings-v4';
+const CACHE_NAME = 'sabellesings-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -38,10 +38,11 @@ self.addEventListener('activate', (event) => {
  */
 const CACHE_FIRST_EXTENSIONS = /\.(?:png|jpe?g|gif|webp|svg|ico|woff2?|ttf|eot|webmanifest)$/i;
 
-// The gig graphics are rebuilt every time the schedule changes and are the
-// whole point of visiting /gigs/, so they go network-first like the HTML --
-// serving a cached poster from last month would defeat the exercise.
-const ALWAYS_FRESH = /^\/gigs\//;
+// /gigs/ is Sabelle's private page for grabbing the current posters. There is
+// no offline story worth having for it and a stale poster is the one outcome
+// that actually hurts, so the worker stays out of the way entirely rather than
+// caching a couple of megabytes nobody will read back.
+const BYPASS_WORKER = /^\/gigs\//;
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -49,10 +50,10 @@ self.addEventListener('fetch', (event) => {
 
   const requestUrl = new URL(request.url);
   if (requestUrl.origin !== self.location.origin) return;
+  if (BYPASS_WORKER.test(requestUrl.pathname)) return;
 
   // Determine strategy based on file type
-  const useCacheFirst =
-    CACHE_FIRST_EXTENSIONS.test(requestUrl.pathname) && !ALWAYS_FRESH.test(requestUrl.pathname);
+  const useCacheFirst = CACHE_FIRST_EXTENSIONS.test(requestUrl.pathname);
 
   if (useCacheFirst) {
     // Cache-first: serve from cache instantly, fetch only on miss

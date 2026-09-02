@@ -7,7 +7,6 @@ into PNGs, so the graphic is regenerated from the same data the site renders --
 the poster can never disagree with the website.
 """
 
-import hashlib
 import html
 import json
 import os
@@ -484,18 +483,17 @@ def main():
     theme = theme_for(gigs)
 
     os.makedirs(OUT_DIR, exist_ok=True)
-    built = []
     for name, story in (("card-post.html", False), ("card-story.html", True)):
-        markup = card_html(gigs, theme, story=story)
-        built.append(markup)
         with open(os.path.join(OUT_DIR, name), "w", encoding="utf-8") as f:
-            f.write(markup)
+            f.write(card_html(gigs, theme, story=story))
 
-    # GitHub Pages serves the PNGs with max-age=14400 and the filenames never
-    # change, so a browser that has seen last month's poster keeps showing it
-    # for four hours. Fingerprint the link with a digest of the markup the
-    # screenshots are taken from: same poster, same URL; new poster, new URL.
-    asset_v = hashlib.sha1("".join(built).encode("utf-8")).hexdigest()[:8]
+    # /gigs/ is one person's page, so there is nothing to gain by letting a
+    # poster be cached and everything to lose. GitHub Pages serves images with
+    # max-age=14400 and will not take a no-store header from us, so a URL that
+    # differs every build is the only way to say "always fetch this". This page
+    # is excluded from the workflow's change detection, so a token that moves
+    # every run costs nothing.
+    asset_v = datetime.now().strftime("%Y%m%d%H%M%S")
 
     with open(os.path.join(OUT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(landing_html(gigs, theme, asset_v))
