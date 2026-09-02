@@ -46,7 +46,7 @@ MONTH_HUES = {
     6:  (175, "seafoam"),
     7:  (21,  "sunset"),
     8:  (95,  "sage"),
-    9:  (32,  "apricot"),
+    9:  (305, "orchid"),
     10: (355, "terracotta"),
     11: (255, "lavender"),
     12: (195, "frost"),
