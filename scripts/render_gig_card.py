@@ -308,20 +308,35 @@ ROW_VARS = {
     "row-gap": (12, 18),
 }
 
-# Past this many rows a poster is unreadable, and shrinking text further stops
-# helping. Show the first N and point at the site for the rest.
-MAX_ROWS = {False: 8, True: 12}  # keyed by is_story
+# All three numbers below were measured in headless Chrome by rendering each row
+# count at descending scales and taking the largest that did not clip the
+# footer -- not guessed. check_cards.py re-checks the result on every build.
+#
+# Rows that fit at full size:
+FULL_SIZE_ROWS = {False: 8, True: 9}  # keyed by is_story
 
-# Rows start shrinking past this count, before the hard cap kicks in.
-SHRINK_ABOVE = {False: 6, True: 9}
+# Row height came out very nearly proportional to the scale, so rows * scale is
+# close to constant. Measured 7.84-8.10 across 9..14 rows for the post and
+# 9.60-9.92 across 10..20 for the story; these sit just under the tightest of
+# each, leaving margin for a font or browser update moving the metrics.
+FIT_BUDGET = {False: 7.8, True: 9.5}
+
+# The most rows the card can hold at all: 14 rows land at scale 0.56 on the
+# post, 20 at 0.48 on the story. A month only gets sent to the website when it
+# genuinely will not fit, and even then the "+N more" line takes one of these
+# slots rather than being extra.
+MAX_ROWS = {False: 14, True: 20}
 
 
-def scale_for_count(n, story):
-    """Shrink rows when the list is long so the card never overflows."""
-    limit = SHRINK_ABOVE[story]
-    if n <= limit:
+def scale_for_count(rows, story):
+    """Shrink the rows so that `rows` of them fit inside the card.
+
+    Takes the number of rows actually rendered -- the "+N more" line included,
+    since it takes up the list just like a gig does.
+    """
+    if rows <= FULL_SIZE_ROWS[story]:
         return ""
-    k = max(0.7, limit / n)
+    k = FIT_BUDGET[story] / rows
     idx = 1 if story else 0
     decls = " ".join(
         f"--{name}:{base[idx] * k:.1f}px;" for name, base in ROW_VARS.items()
@@ -331,7 +346,12 @@ def scale_for_count(n, story):
 
 def card_html(gigs, theme, story=False):
     cap = MAX_ROWS[story]
-    shown, hidden = gigs[:cap], max(0, len(gigs) - cap)
+    if len(gigs) <= cap:
+        shown, hidden = gigs, 0
+    else:
+        # The "+N more" line needs a row of its own, so it costs one gig.
+        shown, hidden = gigs[: cap - 1], len(gigs) - (cap - 1)
+    rendered = len(shown) + (1 if hidden else 0)
     if shown:
         more = (
             f'\n        <li class="more">+{hidden} more '
@@ -352,7 +372,7 @@ def card_html(gigs, theme, story=False):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="{FONTS}" rel="stylesheet">
-<style>{theme_css(theme)}{CARD_CSS}{vars_css}{scale_for_count(len(gigs), story)}</style>
+<style>{theme_css(theme)}{CARD_CSS}{vars_css}{scale_for_count(rendered, story)}</style>
 </head><body>
   <div class="card">
     <div class="petals p1">✿</div>

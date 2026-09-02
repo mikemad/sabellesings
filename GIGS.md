@@ -78,9 +78,10 @@ fetch this".
 That means she should always grab posters from the buttons on `/gigs/`, not
 from a bookmarked image URL.
 
-When there are more than 8 shows, the post shows the first 8 and adds
-"+N more dates at sabellesings.com" rather than shrinking the text to nothing.
-The `/gigs/` page always lists every date.
+The rows shrink to fit, so a busy month still goes on one graphic: the post
+holds **14 dates** and the story **20**, which is more than she has ever played
+in a month. Only past that does the poster show what it can and add "+N more
+dates at sabellesings.com". The `/gigs/` page always lists every date.
 
 ### The colours change every month
 
