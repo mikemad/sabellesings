@@ -345,3 +345,30 @@ document.querySelectorAll('section').forEach(section => {
         });
     });
 })();
+
+// ── Past shows: fold the long tail away ───────────────────────────────────
+// render_gigs.py writes every past show into the HTML so the list survives
+// with JavaScript off. Here we collapse it to the most recent handful and
+// hand over a button, which only exists once we know it will work.
+(function initPastShows() {
+    const list = document.getElementById('past-gigs');
+    const btn = document.querySelector('.past-toggle');
+    if (!list || !btn || !list.querySelector('.past-overflow')) return;
+
+    const total = btn.dataset.total || list.querySelectorAll('.tour-date').length;
+
+    const sync = () => {
+        const collapsed = list.classList.contains('is-collapsed');
+        btn.setAttribute('aria-expanded', String(!collapsed));
+        btn.textContent = collapsed ? `Show all ${total} past shows` : 'Show fewer';
+    };
+
+    list.classList.add('is-collapsed');
+    btn.hidden = false;
+    sync();
+
+    btn.addEventListener('click', () => {
+        list.classList.toggle('is-collapsed');
+        sync();
+    });
+})();

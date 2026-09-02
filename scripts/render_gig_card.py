@@ -30,6 +30,103 @@ MONTHS = [
     "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER",
 ]
 
+# One pastel wash per month, so a fresh poster reads as a fresh month at a
+# glance. July is the anchor -- it reproduces the sunset palette the rest of the
+# site is built around -- and every other month is that exact recipe rotated to
+# a new hue, so they all sit at the same lightness and saturation and none of
+# them comes out looking washed out next to the others.
+#
+# Hues are spread so no two neighbouring months read alike.
+MONTH_HUES = {
+    1:  (220, "periwinkle"),
+    2:  (340, "blush"),
+    3:  (150, "mint"),
+    4:  (275, "lilac"),
+    5:  (48,  "butter"),
+    6:  (175, "seafoam"),
+    7:  (21,  "sunset"),
+    8:  (95,  "sage"),
+    9:  (32,  "apricot"),
+    10: (355, "terracotta"),
+    11: (255, "lavender"),
+    12: (195, "frost"),
+}
+
+# (hue offset, saturation, lightness) per role, read off the original July card.
+ROLE_RECIPE = {
+    "wash":     (14, 55, 95),   # the paper
+    "tint":     (-4, 92, 92),   # the glow behind the header
+    "warm":     (8,  51, 64),   # rules, petals, row stripes
+    "accent":   (0,  73, 68),   # SABELLE
+    "deep":     (0,  37, 54),   # its drop shadow, dates, month label
+    "soft":     (-8, 33, 62),   # tagline, city
+    "ink":      (2,  28, 33),   # borders and venue names
+}
+CONTRAST_RECIPE = (60, 22, 44)  # set times -- the one colour that steps outside
+
+
+def _hsl_hex(h, s, l):
+    """HSL (degrees, %, %) -> #rrggbb."""
+    h = (h % 360) / 360.0
+    s, l = s / 100.0, l / 100.0
+    if s == 0:
+        rgb = (l, l, l)
+    else:
+        q = l * (1 + s) if l < 0.5 else l + s - l * s
+        p = 2 * l - q
+
+        def channel(t):
+            t = t % 1.0
+            if t < 1 / 6:
+                return p + (q - p) * 6 * t
+            if t < 1 / 2:
+                return q
+            if t < 2 / 3:
+                return p + (q - p) * (2 / 3 - t) * 6
+            return p
+
+        rgb = (channel(h + 1 / 3), channel(h), channel(h - 1 / 3))
+    return "#" + "".join(f"{round(c * 255):02X}" for c in rgb)
+
+
+def _palette(hue, name):
+    t = {role: _hsl_hex(hue + dh, s, l) for role, (dh, s, l) in ROLE_RECIPE.items()}
+    dh, s, l = CONTRAST_RECIPE
+    t["contrast"] = _hsl_hex(hue + dh, s, l)
+    t["name"] = name
+    return t
+
+
+MONTH_THEMES = {m: _palette(hue, name) for m, (hue, name) in MONTH_HUES.items()}
+
+
+def rgba(hex_color, alpha):
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return f"rgba({r},{g},{b},{alpha})"
+
+
+def theme_for(gigs):
+    """Colour the poster by the month it is advertising, not by today."""
+    month = date.fromisoformat(gigs[0]["date"]).month if gigs else TODAY.month
+    return MONTH_THEMES[month]
+
+
+def theme_css(t):
+    """The month palette, plus the translucent washes derived from it."""
+    return (
+        ":root{"
+        f"--wash:{t['wash']};--tint:{t['tint']};--accent:{t['accent']};"
+        f"--accent-deep:{t['deep']};--soft:{t['soft']};--warm:{t['warm']};"
+        f"--contrast:{t['contrast']};--ink:{t['ink']};"
+        f"--tint-85:{rgba(t['tint'], .85)};--accent-30:{rgba(t['accent'], .30)};"
+        f"--warm-45:{rgba(t['warm'], .45)};--accent-16:{rgba(t['accent'], .16)};"
+        f"--warm-13:{rgba(t['warm'], .13)};--contrast-10:{rgba(t['contrast'], .10)};"
+        f"--ink-18:{rgba(t['ink'], .18)};"
+        "}"
+    )
+
+
 FONTS = (
     "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Kalam:wght@300;400;700"
     "&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
@@ -75,20 +172,15 @@ def rows_html(gigs):
 
 CARD_CSS = """
 * { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --golden-hour:#D4A574; --sunset-orange:#E89F71; --dusty-rose:#C08B7C;
-  --warm-cream:#FAF3E8; --deep-amber:#B67E5C; --vintage-brown:#6B4E3D;
-  --soft-peach:#FFE4D6; --retro-green:#7D8B5F;
-}
 html,body{ background:#fff; }
 body{ display:flex; align-items:center; justify-content:center; }
 .card{
   position:relative; overflow:hidden;
   background:
-    radial-gradient(circle at 18% 12%, rgba(255,228,214,.85), transparent 42%),
-    radial-gradient(circle at 84% 8%,  rgba(232,159,113,.30), transparent 38%),
-    radial-gradient(circle at 50% 108%, rgba(212,165,116,.45), transparent 55%),
-    var(--warm-cream);
+    radial-gradient(circle at 18% 12%, var(--tint-85), transparent 42%),
+    radial-gradient(circle at 84% 8%,  var(--accent-30), transparent 38%),
+    radial-gradient(circle at 50% 108%, var(--warm-45), transparent 55%),
+    var(--wash);
   display:flex; flex-direction:column;
 }
 /* sun rays behind the header */
@@ -96,46 +188,46 @@ body{ display:flex; align-items:center; justify-content:center; }
   content:""; position:absolute; top:-38%; left:50%; width:150%; aspect-ratio:1;
   transform:translateX(-50%);
   background:repeating-conic-gradient(from 0deg at 50% 50%,
-    rgba(232,159,113,.16) 0deg 7deg, transparent 7deg 14deg);
+    var(--accent-16) 0deg 7deg, transparent 7deg 14deg);
   opacity:.7; pointer-events:none;
 }
 /* paper grain */
 .card::after{
   content:""; position:absolute; inset:0; pointer-events:none; opacity:.05;
-  background-image:radial-gradient(#6B4E3D 1px, transparent 1px);
+  background-image:radial-gradient(var(--ink) 1px, transparent 1px);
   background-size:5px 5px;
 }
 .inner{
   position:relative; z-index:2; flex:1; display:flex; flex-direction:column;
-  margin:var(--frame); border:3px solid var(--vintage-brown); border-radius:26px;
+  margin:var(--frame); border:3px solid var(--ink); border-radius:26px;
   padding:var(--pad);
 }
 .inner::before{
-  content:""; position:absolute; inset:14px; border:2px dashed var(--deep-amber);
+  content:""; position:absolute; inset:14px; border:2px dashed var(--accent-deep);
   border-radius:16px; opacity:.55; pointer-events:none;
 }
 .head{ text-align:center; }
 .name{
   font-family:'Bebas Neue',sans-serif; letter-spacing:.06em; line-height:.92;
-  font-size:var(--name-size); color:var(--sunset-orange);
-  text-shadow:5px 5px 0 var(--deep-amber), 10px 10px 0 rgba(107,78,61,.18);
+  font-size:var(--name-size); color:var(--accent);
+  text-shadow:5px 5px 0 var(--accent-deep), 10px 10px 0 var(--ink-18);
 }
 .tag{
-  font-family:'Kalam',cursive; color:var(--dusty-rose);
+  font-family:'Kalam',cursive; color:var(--soft);
   font-size:var(--tag-size); margin-top:.35em;
 }
 .rule{
   display:flex; align-items:center; gap:18px; margin:var(--rule-gap) 0;
-  color:var(--golden-hour);
+  color:var(--warm);
 }
 .rule span{ flex:1; height:2px; background:currentColor; opacity:.5; }
 .rule b{ font-size:calc(var(--tag-size) * .9); }
 .title{
-  font-family:'Bebas Neue',sans-serif; text-align:center; color:var(--vintage-brown);
+  font-family:'Bebas Neue',sans-serif; text-align:center; color:var(--ink);
   font-size:var(--title-size); letter-spacing:.08em; line-height:1;
 }
 .month{
-  font-family:'Space Mono',monospace; text-align:center; color:var(--deep-amber);
+  font-family:'Space Mono',monospace; text-align:center; color:var(--accent-deep);
   font-size:var(--month-size); letter-spacing:.3em; margin-top:.5em; font-weight:700;
 }
 /* One shared set of columns so every row's venue starts at the same x. */
@@ -148,44 +240,44 @@ body{ display:flex; align-items:center; justify-content:center; }
   grid-column:1 / -1; display:grid; grid-template-columns:subgrid;
   gap:var(--col-gap); align-items:center;
   padding:var(--row-pad) calc(var(--row-pad) * .9);
-  border-radius:14px; background:rgba(212,165,116,.13);
+  border-radius:14px; background:var(--warm-13);
 }
-.gig:nth-child(even){ background:rgba(125,139,95,.10); }
+.gig:nth-child(even){ background:var(--contrast-10); }
 .g-date{
-  font-family:'Bebas Neue',sans-serif; color:var(--deep-amber);
+  font-family:'Bebas Neue',sans-serif; color:var(--accent-deep);
   font-size:var(--date-size); letter-spacing:.05em; white-space:nowrap;
 }
 .g-mid{ display:flex; flex-direction:column; min-width:0; }
 .g-venue{
-  font-family:'Space Mono',monospace; font-weight:700; color:var(--vintage-brown);
+  font-family:'Space Mono',monospace; font-weight:700; color:var(--ink);
   font-size:var(--venue-size); line-height:1.25;
 }
 .g-city{
-  font-family:'Space Mono',monospace; color:var(--dusty-rose);
+  font-family:'Space Mono',monospace; color:var(--soft);
   font-size:var(--city-size); margin-top:.15em;
 }
 .g-time{
-  font-family:'Space Mono',monospace; font-weight:700; color:var(--retro-green);
+  font-family:'Space Mono',monospace; font-weight:700; color:var(--contrast);
   font-size:var(--time-size); white-space:nowrap; text-align:right;
 }
 .more{
   grid-column:1 / -1; text-align:center; padding-top:.35em;
   font-family:'Space Mono',monospace; font-style:italic;
-  color:var(--deep-amber); font-size:var(--city-size); letter-spacing:.05em;
+  color:var(--accent-deep); font-size:var(--city-size); letter-spacing:.05em;
 }
 .empty{
   flex:1; display:flex; flex-direction:column; align-items:center;
   justify-content:center; text-align:center; gap:.6em;
-  font-family:'Space Mono',monospace; color:var(--vintage-brown);
+  font-family:'Space Mono',monospace; color:var(--ink);
   font-size:var(--venue-size);
 }
 .foot{
   margin-top:var(--foot-top); text-align:center;
-  font-family:'Space Mono',monospace; color:var(--vintage-brown);
+  font-family:'Space Mono',monospace; color:var(--ink);
 }
-.handle{ font-size:var(--handle-size); font-weight:700; color:var(--deep-amber); letter-spacing:.12em; }
-.site{ font-size:var(--site-size); color:var(--dusty-rose); margin-top:.45em; letter-spacing:.22em; }
-.petals{ position:absolute; z-index:3; color:var(--golden-hour); opacity:.5; }
+.handle{ font-size:var(--handle-size); font-weight:700; color:var(--accent-deep); letter-spacing:.12em; }
+.site{ font-size:var(--site-size); color:var(--soft); margin-top:.45em; letter-spacing:.22em; }
+.petals{ position:absolute; z-index:3; color:var(--warm); opacity:.5; }
 .p1{ top:3.2%; left:5%;  font-size:var(--petal); transform:rotate(-12deg); }
 .p2{ bottom:3.2%; right:5.5%; font-size:var(--petal); transform:rotate(14deg); }
 """
@@ -241,7 +333,7 @@ def scale_for_count(n, story):
     return f".card{{ {decls} }}"
 
 
-def card_html(gigs, story=False):
+def card_html(gigs, theme, story=False):
     cap = MAX_ROWS[story]
     shown, hidden = gigs[:cap], max(0, len(gigs) - cap)
     if shown:
@@ -264,7 +356,7 @@ def card_html(gigs, story=False):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="{FONTS}" rel="stylesheet">
-<style>{CARD_CSS}{vars_css}{scale_for_count(len(gigs), story)}</style>
+<style>{theme_css(theme)}{CARD_CSS}{vars_css}{scale_for_count(len(gigs), story)}</style>
 </head><body>
   <div class="card">
     <div class="petals p1">✿</div>
@@ -303,7 +395,7 @@ def plain_line(gig):
     return line
 
 
-def landing_html(gigs):
+def landing_html(gigs, theme):
     if gigs:
         items = "\n".join(
             f"      <li><b>{esc(short_day(g))}</b> — {esc(plain_line(g).split(' — ', 1)[1])}</li>"
@@ -325,25 +417,25 @@ def landing_html(gigs):
 <link href="{FONTS}" rel="stylesheet">
 <style>
   *{{margin:0;padding:0;box-sizing:border-box}}
-  body{{background:#FAF3E8;color:#6B4E3D;font-family:'Space Mono',monospace;
+  body{{background:{theme['wash']};color:{theme['ink']};font-family:'Space Mono',monospace;
        padding:40px 20px;line-height:1.6}}
   .wrap{{max-width:900px;margin:0 auto}}
-  h1{{font-family:'Bebas Neue',sans-serif;font-size:56px;color:#B67E5C;letter-spacing:.05em}}
-  .sub{{font-family:'Kalam',cursive;color:#C08B7C;font-size:20px;margin-bottom:28px}}
+  h1{{font-family:'Bebas Neue',sans-serif;font-size:56px;color:{theme['deep']};letter-spacing:.05em}}
+  .sub{{font-family:'Kalam',cursive;color:{theme['soft']};font-size:20px;margin-bottom:28px}}
   .cards{{display:flex;gap:28px;flex-wrap:wrap;margin:28px 0}}
   .col{{flex:1;min-width:260px}}
   .col h2{{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;margin-bottom:10px}}
-  img{{width:100%;border:3px solid #6B4E3D;border-radius:14px;display:block}}
-  a.btn{{display:inline-block;margin-top:12px;background:#E89F71;color:#fff;
+  img{{width:100%;border:3px solid {theme['ink']};border-radius:14px;display:block}}
+  a.btn{{display:inline-block;margin-top:12px;background:{theme['accent']};color:#fff;
         text-decoration:none;padding:12px 22px;border-radius:30px;font-weight:700}}
-  a.btn:hover{{background:#B67E5C}}
+  a.btn:hover{{background:{theme['deep']}}}
   ul{{list-style:none;margin:14px 0}}
-  li{{padding:10px 14px;background:rgba(212,165,116,.14);border-radius:10px;margin-bottom:8px}}
-  .box{{background:rgba(125,139,95,.10);border:2px dashed #7D8B5F;border-radius:14px;
+  li{{padding:10px 14px;background:{rgba(theme['warm'], .22)};border-radius:10px;margin-bottom:8px}}
+  .box{{background:{rgba(theme['contrast'], .10)};border:2px dashed {theme['contrast']};border-radius:14px;
        padding:18px;margin-top:14px}}
   textarea{{width:100%;min-height:130px;border:none;background:transparent;
            font:inherit;color:inherit;resize:vertical}}
-  .note{{font-size:13px;color:#C08B7C;margin-top:30px}}
+  .note{{font-size:13px;color:{theme['soft']};margin-top:30px}}
 </style></head>
 <body><div class="wrap">
   <h1>GIG GRAPHICS</h1>
@@ -393,14 +485,16 @@ def main():
             pass
     gigs.sort(key=lambda g: (g["date"], g.get("venue", "")))
 
+    theme = theme_for(gigs)
+
     os.makedirs(OUT_DIR, exist_ok=True)
     for name, story in (("card-post.html", False), ("card-story.html", True)):
         with open(os.path.join(OUT_DIR, name), "w", encoding="utf-8") as f:
-            f.write(card_html(gigs, story=story))
+            f.write(card_html(gigs, theme, story=story))
     with open(os.path.join(OUT_DIR, "index.html"), "w", encoding="utf-8") as f:
-        f.write(landing_html(gigs))
+        f.write(landing_html(gigs, theme))
 
-    print(f"Built gig cards for {len(gigs)} upcoming gig(s).")
+    print(f"Built gig cards for {len(gigs)} upcoming gig(s) in {theme['name']}.")
     return 0
 
 

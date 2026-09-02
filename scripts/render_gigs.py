@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
-"""Render gigs.json into the Upcoming Gigs block of index.html.
+"""Render gigs.json into index.html.
 
-Rows are written between the GIGS:START / GIGS:END markers, so the shows stay
-in the static HTML -- crawlable, and never blanked by a failed fetch.
+Two blocks, both written straight into the static HTML so they stay crawlable
+and are never blanked by a failed fetch:
 
-Gigs are dropped the day after they happen (Pacific time, since every show is
-in California), which is what keeps the section from going stale on its own.
+  GIGS:START / GIGS:END          the shows still to come
+  PASTGIGS:START / PASTGIGS:END  everything that has already happened
+
+A gig moves from the first block to the second the day after it happens
+(Pacific time, since every show is in California), which is what keeps the
+upcoming section from going stale on its own.
+
+The past list renders in full. retro-scripts.js collapses it to the most
+recent PAST_VISIBLE rows and adds the expand button, so with JavaScript off
+the whole history is still there.
 """
 
 import html
@@ -25,7 +33,12 @@ INDEX = "index.html"
 GIGS_FILE = "gigs.json"
 START = "<!-- GIGS:START -->"
 END = "<!-- GIGS:END -->"
+PAST_START = "<!-- PASTGIGS:START -->"
+PAST_END = "<!-- PASTGIGS:END -->"
 INSTAGRAM = "https://www.instagram.com/sabellesings/"
+
+# How many past shows stay visible before the "show all" button takes over.
+PAST_VISIBLE = 12
 
 MONTHS = [
     "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
@@ -49,6 +62,61 @@ def render_rows(gigs):
         out.append(f'                    <span class="date-time">{esc(g.get("time", ""))}</span>')
         out.append("                </div>")
     return "\n".join(out)
+
+
+def render_past_rows(past):
+    """Newest first, grouped under a year heading.
+
+    Rows past PAST_VISIBLE are tagged so the script can fold them away; a year
+    heading is tagged with its first row, since it is only there for those rows.
+    """
+    out = []
+    year = None
+    for i, g in enumerate(past):
+        d = date.fromisoformat(g["date"])
+        overflow = " past-overflow" if i >= PAST_VISIBLE else ""
+        if d.year != year:
+            year = d.year
+            out.append(f'                <h3 class="past-year{overflow}">{year}</h3>')
+        day = f"{MONTHS[d.month - 1][:3]} {d.day}"
+        out.append(f'                <div class="tour-date{overflow}">')
+        out.append(f'                    <span class="date-day">{esc(day)}</span>')
+        out.append(f'                    <span class="date-venue">{esc(g["venue"])}</span>')
+        out.append(f'                    <span class="date-city">{esc(g.get("city", ""))}</span>')
+        out.append(f'                    <span class="date-time">{esc(g.get("time", ""))}</span>')
+        out.append("                </div>")
+    return "\n".join(out)
+
+
+def build_past_block(past):
+    """The whole Past Shows section, markers included -- or just the markers."""
+    if not past:
+        return f"    {PAST_START}\n    {PAST_END}"
+
+    total = len(past)
+    shows = "show" if total == 1 else "shows"
+    lines = [
+        f"    {PAST_START}",
+        "    <!-- Past Shows -->",
+        '    <section class="tour-section past-section" id="past-shows"'
+        ' aria-labelledby="past-shows-title">',
+        '        <div class="tour-poster">',
+        '            <div class="poster-header">',
+        '                <h2 class="poster-title" id="past-shows-title">PAST SHOWS</h2>',
+        f'                <p class="poster-subtitle">{total} {shows} and counting</p>',
+        "            </div>",
+        '            <div class="tour-dates" id="past-gigs">',
+        render_past_rows(past),
+        "            </div>",
+    ]
+    if total > PAST_VISIBLE:
+        lines.append(
+            '            <button class="past-toggle" type="button" hidden'
+            f' aria-expanded="true" aria-controls="past-gigs" data-total="{total}">'
+            f"Show all {total} past shows</button>"
+        )
+    lines += ["        </div>", "    </section>", f"    {PAST_END}"]
+    return "\n".join(lines)
 
 
 def render_empty():
@@ -79,41 +147,47 @@ def build_block(gigs):
     return "\n".join(lines)
 
 
+def replace_block(src, start, end, block):
+    """Swap whatever sits between the markers for a freshly built block.
+
+    The markers' own indentation is already in src, so the replacement drops
+    the leading whitespace of its first line.
+    """
+    pattern = re.compile(re.escape(start) + ".*?" + re.escape(end), re.DOTALL)
+    return pattern.sub(lambda _: block.strip(), src, count=1)
+
+
 def main():
     with open(GIGS_FILE, encoding="utf-8") as f:
         data = json.load(f)
 
-    upcoming = []
+    upcoming, past = [], []
     for g in data.get("gigs", []):
         try:
-            if date.fromisoformat(g["date"]) >= TODAY:
-                upcoming.append(g)
+            (upcoming if date.fromisoformat(g["date"]) >= TODAY else past).append(g)
         except (KeyError, ValueError):
             print(f"WARNING: skipping malformed gig entry: {g!r}")
     upcoming.sort(key=lambda g: (g["date"], g.get("venue", "")))
+    past.sort(key=lambda g: (g["date"], g.get("venue", "")), reverse=True)
 
     with open(INDEX, encoding="utf-8") as f:
         src = f.read()
 
-    if START not in src or END not in src:
-        print(f"ERROR: {INDEX} is missing the {START} / {END} markers.")
-        return 1
+    for marker in (START, END, PAST_START, PAST_END):
+        if marker not in src:
+            print(f"ERROR: {INDEX} is missing the {marker} marker.")
+            return 1
 
-    pattern = re.compile(
-        re.escape(START) + ".*?" + re.escape(END), re.DOTALL
-    )
-    new_block = build_block(upcoming)
-    # Re-anchor on the marker's own indentation so we replace the full line.
-    updated = pattern.sub(lambda _: new_block.strip(), src, count=1)
-    # sub() dropped the leading indent of the START line; it is already in src.
+    updated = replace_block(src, START, END, build_block(upcoming))
+    updated = replace_block(updated, PAST_START, PAST_END, build_past_block(past))
 
     if updated == src:
-        print(f"No change ({len(upcoming)} upcoming gig(s)).")
+        print(f"No change ({len(upcoming)} upcoming, {len(past)} past).")
         return 0
 
     with open(INDEX, "w", encoding="utf-8") as f:
         f.write(updated)
-    print(f"Rendered {len(upcoming)} upcoming gig(s) into {INDEX}.")
+    print(f"Rendered {len(upcoming)} upcoming and {len(past)} past gig(s) into {INDEX}.")
     return 0
 
 

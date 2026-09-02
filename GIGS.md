@@ -19,21 +19,39 @@ That's the whole job. A few things worth knowing:
   the next one coming up, so you can type it without thinking about the year.
 - **Times** can be `5-8pm`, `5:30 - 8:30 PM`, or `5 to 8 pm`. They all come out
   looking the same on the site.
-- **Past shows disappear on their own.** Leave them in the sheet or delete them,
-  whichever you like — the site only ever shows what hasn't happened yet.
+- **Past shows move themselves.** The day after a show, it drops out of
+  Upcoming Gigs and reappears under **Past Shows** further down the page, so
+  the history builds up on its own. Leave the row in the sheet or delete it —
+  once a show has happened the site keeps it either way.
 - **Blank rows are ignored**, so you can leave gaps for spacing.
-- Changes take up to about **6 hours** to appear. To see them right away, ask
-  Mike to run the sync, or use the **Run workflow** button on the Sync Gigs
-  action in GitHub.
+- Changes appear **within a minute or two** if the sheet's **Gigs → Publish
+  now** menu is set up (see below); otherwise within about **6 hours**.
 
 If you typo something, that one row is skipped and the rest still publish. If
 the whole sheet is unreadable, the site just keeps showing the dates it already
 had — a bad edit can't take the schedule down.
 
+## Past shows
+
+Everything that has already happened is listed under **Past Shows**, below the
+upcoming dates — the point being that a year of steady gigs looks like a year of
+steady gigs. The list is grouped by year, newest first, and shows the twelve
+most recent with a button for the rest.
+
+Two things to know:
+
+- **The archive keeps growing.** Deleting a past row from the sheet no longer
+  removes it from the site. Once a date passes, that show is kept in `gigs.json`
+  whether or not the sheet still lists it.
+- **To remove a past show for real**, delete it from `gigs.json` (a code change).
+  Deleting an *upcoming* show still works exactly as before: take the row out of
+  the sheet and it's gone at the next sync.
+
 ## The graphics
 
 Every sync rebuilds two posters from the same dates the website uses, so the
-graphic can never disagree with the site:
+graphic can never disagree with the site. Only upcoming shows go on the poster —
+the past-show list lives on the website, not on Instagram.
 
 - `gigs/gig-card.png` — 1080×1350, the Instagram feed post
 - `gigs/gig-card-story.png` — 1080×1920, the story
@@ -45,6 +63,15 @@ search results — it's just for her.
 When there are more than 8 shows, the post shows the first 8 and adds
 "+N more dates at sabellesings.com" rather than shrinking the text to nothing.
 The `/gigs/` page always lists every date.
+
+### The colours change every month
+
+The poster is tinted by the month of the first show on it, cycling through
+twelve pastels — periwinkle in January, blush in February, mint in March, and
+so on round to frost in December. July keeps the original sunset palette; every
+other month is that same recipe rotated to a new hue, so they all sit at the
+same weight and none of them comes out looking washed out. Nothing to set: post
+a March run and it comes out mint.
 
 ## Setup (one time)
 
@@ -59,6 +86,35 @@ The `/gigs/` page always lists every date.
 Until step 3 is done the workflow is harmless: it logs a warning, leaves
 `gigs.json` alone, and still expires past shows.
 
+## Publishing straight away (one time)
+
+Without this, an edit waits for the next six-hourly run. With it, the sheet
+tells GitHub the moment it changes and the site updates in a minute or two.
+
+1. **Make a token.** GitHub → **Settings → Developer settings → Personal access
+   tokens → Fine-grained tokens → Generate new token**. Scope it to this
+   repository only, and give it **Contents: read-only** and **Actions: read and
+   write**. Copy the token — GitHub shows it once.
+2. **Put it in the sheet's script.** In the spreadsheet: **Extensions → Apps
+   Script**. Paste in the contents of `scripts/sheet-trigger.gs` and save. Then
+   **Project Settings → Script Properties → Add script property**: name
+   `GITHUB_TOKEN`, value the token from step 1.
+3. **Add the trigger.** In Apps Script: **Triggers → Add Trigger** →
+   function `onSheetChange`, source **From spreadsheet**, type **On change**.
+   Save, and approve the permissions prompt.
+4. **Check it.** Reload the spreadsheet — a **Gigs** menu appears. **Gigs →
+   Publish now** should toast "Publishing…", and the Sync Gigs workflow should
+   start in the repo's Actions tab.
+
+A burst of edits collapses into one build: the trigger waits 90 seconds between
+pokes, and GitHub cancels a run that a newer one supersedes. If the token is
+missing, expires, or GitHub is unreachable, the script gives up quietly — the
+six-hourly sync is still there and still catches everything.
+
+> GitHub switches scheduled workflows off in a repository that has had no
+> pushes for 60 days. If the dates ever go stale for no obvious reason, push
+> anything (or hit **Run workflow**) to wake the schedule back up.
+
 ## How it fits together
 
 ```
@@ -69,13 +125,21 @@ Google Sheet ──sync_gigs.py──> gigs.json ──┬── render_gigs.py 
                                              check_cards.py verifies nothing is clipped
 ```
 
-`.github/workflows/sync-gigs.yml` runs that chain every 6 hours and on demand,
-commits only when something actually changed, and then triggers the Pages
-deploy. The scheduled run with no sheet change is what drops shows once their
-date passes.
+`.github/workflows/sync-gigs.yml` runs that chain every 6 hours, on demand, and
+on a `repository_dispatch` from the sheet's Apps Script. It commits only when
+something actually changed, then triggers the Pages deploy. The scheduled run
+with no sheet change is what moves shows into the archive once their date
+passes.
 
-`gigs.json` is generated. Edit the sheet, not the JSON, or the next sync will
-overwrite you.
+`render_gigs.py` writes two blocks into `index.html`: `GIGS:START/END` for the
+upcoming dates and `PASTGIGS:START/END` for the Past Shows section. The past
+list is written out in full and folded down to twelve rows by
+`retro-scripts.js`, so it survives with JavaScript off.
+
+`gigs.json` is generated, and it accumulates — the sheet is authoritative for
+upcoming dates, but past shows stay in the file once they land there. Edit the
+sheet, not the JSON, except when you genuinely need to delete a show from the
+archive.
 
 ## Running it locally
 

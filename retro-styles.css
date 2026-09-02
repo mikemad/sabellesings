@@ -757,6 +757,94 @@ nav.scrolled {
     color: var(--vintage-brown);
 }
 
+/* ========== PAST SHOWS ========== */
+/* The same poster, tilted the other way and set in quieter ink, so the shows
+   still to come stay the first thing you read. */
+.past-section {
+    background: var(--warm-cream);
+}
+
+.past-section .tour-poster {
+    transform: rotate(1deg);
+}
+
+.past-year {
+    grid-column: 1 / -1;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    letter-spacing: 0.2em;
+    color: var(--deep-amber);
+    margin: 1.75rem 0 0.5rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px dashed var(--dusty-rose);
+}
+
+.past-year:first-child {
+    margin-top: 0;
+}
+
+/* Past shows carry a set time too, so they share the upcoming grid. */
+#past-gigs .tour-date {
+    grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
+    background: rgba(125, 139, 95, 0.08);
+}
+
+@supports (grid-template-columns: subgrid) {
+    #past-gigs {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr) max-content max-content;
+    }
+
+    #past-gigs .tour-date {
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+    }
+}
+
+#past-gigs .tour-date:hover {
+    background: rgba(125, 139, 95, 0.16);
+}
+
+#past-gigs .date-city {
+    text-align: left;
+    white-space: nowrap;
+}
+
+#past-gigs .date-time {
+    color: var(--dusty-rose);
+}
+
+/* Applied by retro-scripts.js only. Without JavaScript the full list stands. */
+#past-gigs.is-collapsed .past-overflow {
+    display: none;
+}
+
+.past-toggle {
+    display: block;
+    margin: 1.75rem auto 0;
+    padding: 0.75rem 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--warm-cream);
+    background: var(--deep-amber);
+    border: none;
+    border-radius: 30px;
+    cursor: inherit;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.past-toggle:hover {
+    background: var(--sunset-orange);
+    transform: translateY(-2px);
+}
+
+.past-toggle:focus-visible {
+    outline: 3px solid var(--retro-green);
+    outline-offset: 3px;
+}
+
 /* YouTube Section */
 .youtube-section {
     padding: 6rem 3rem !important;
@@ -1194,12 +1282,14 @@ footer {
         font-size: 2.5rem;
     }
 
-    #upcoming-gigs {
+    #upcoming-gigs,
+    #past-gigs {
         display: block;
     }
 
     .tour-date,
-    #upcoming-gigs .tour-date {
+    #upcoming-gigs .tour-date,
+    #past-gigs .tour-date {
         grid-column: auto;
         grid-template-columns: 1fr;
         text-align: center;
@@ -1207,8 +1297,13 @@ footer {
     }
 
     #upcoming-gigs .date-city,
+    #past-gigs .date-city,
     .date-city,
     .date-time {
+        text-align: center;
+    }
+
+    .past-year {
         text-align: center;
     }
 

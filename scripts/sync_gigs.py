@@ -5,6 +5,10 @@ Sabelle edits a Google Sheet; this turns it into data the site can render.
 Bad rows are skipped rather than published, and a sheet that yields no usable
 rows at all leaves gigs.json untouched -- a typo should never wipe the list.
 
+gigs.json accumulates. The sheet is authoritative for anything still to come,
+but a show whose date has passed is kept even after Sabelle tidies the row out
+of the sheet, because the site lists her history under the upcoming dates.
+
 Exit codes:
   0  gigs.json is good (possibly unchanged)
   1  nothing was written; the previous gigs.json still stands
@@ -18,7 +22,19 @@ import os
 import re
 import sys
 import urllib.request
-from datetime import date
+from datetime import date, datetime
+
+try:
+    from zoneinfo import ZoneInfo
+
+    def _today():
+        # Every show is in California, so "has it happened yet" is a Pacific
+        # question -- and the renderers already answer it that way.
+        return datetime.now(ZoneInfo("America/Los_Angeles")).date()
+except Exception:  # pragma: no cover - zoneinfo missing/no tzdata
+    def _today():
+        return date.today()
+
 
 GIGS_FILE = "gigs.json"
 FETCH_TIMEOUT = 30
@@ -96,6 +112,30 @@ def pick(row, *names):
     return ""
 
 
+def load_existing():
+    """The gigs.json already in the repo -- where the past-show archive lives."""
+    try:
+        with open(GIGS_FILE, encoding="utf-8") as f:
+            return json.load(f).get("gigs", [])
+    except FileNotFoundError:
+        return []
+    except (OSError, ValueError) as e:
+        print(f"WARNING: {GIGS_FILE} is unreadable ({e}); the archive restarts empty.")
+        return []
+
+
+def gig_key(g):
+    """Same show, however it was spelled in the sheet that week."""
+    return (g.get("date", ""), (g.get("venue") or "").strip().lower())
+
+
+def is_past(g, today):
+    try:
+        return date.fromisoformat(g["date"]) < today
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
 def main():
     url = os.environ.get("GIGS_SHEET_CSV_URL", "").strip()
     if not url:
@@ -115,7 +155,7 @@ def main():
         print("Use File > Share > Publish to web, and pick 'Comma-separated values'.")
         return 1
 
-    today = date.today()
+    today = _today()
     gigs, skipped, data_rows = [], [], 0
 
     for i, row in enumerate(csv.DictReader(io.StringIO(body)), start=2):
@@ -157,12 +197,23 @@ def main():
             print(s)
         return 1
 
+    # Shows that have already happened stay put whether or not the sheet still
+    # lists them; only the future is the sheet's to remove.
+    from_sheet = {gig_key(g) for g in gigs}
+    archived = [
+        g for g in load_existing()
+        if is_past(g, today) and gig_key(g) not in from_sheet
+    ]
+    gigs.extend(archived)
+
     gigs.sort(key=lambda g: (g["date"], g["venue"]))
 
     payload = {
         "_comment": (
             "Generated from the Upcoming Gigs Google Sheet by "
-            ".github/workflows/sync-gigs.yml. Edit the sheet, not this file."
+            ".github/workflows/sync-gigs.yml. Edit the sheet, not this file. "
+            "Shows whose date has passed are kept here as the site's archive "
+            "even once they leave the sheet."
         ),
         "gigs": gigs,
     }
@@ -170,7 +221,12 @@ def main():
         json.dump(payload, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
-    print(f"Wrote {len(gigs)} gig(s) to {GIGS_FILE}.")
+    upcoming = sum(1 for g in gigs if not is_past(g, today))
+    print(
+        f"Wrote {len(gigs)} gig(s) to {GIGS_FILE}: "
+        f"{upcoming} upcoming, {len(gigs) - upcoming} past "
+        f"({len(archived)} kept from the archive)."
+    )
     if skipped:
         print(f"Skipped {len(skipped)} bad row(s):")
         for s in skipped:

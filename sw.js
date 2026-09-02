@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sabellesings-v3';
+const CACHE_NAME = 'sabellesings-v4';
 const ASSETS = [
   '/',
   '/index.html',
@@ -38,6 +38,11 @@ self.addEventListener('activate', (event) => {
  */
 const CACHE_FIRST_EXTENSIONS = /\.(?:png|jpe?g|gif|webp|svg|ico|woff2?|ttf|eot|webmanifest)$/i;
 
+// The gig graphics are rebuilt every time the schedule changes and are the
+// whole point of visiting /gigs/, so they go network-first like the HTML --
+// serving a cached poster from last month would defeat the exercise.
+const ALWAYS_FRESH = /^\/gigs\//;
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -46,7 +51,8 @@ self.addEventListener('fetch', (event) => {
   if (requestUrl.origin !== self.location.origin) return;
 
   // Determine strategy based on file type
-  const useCacheFirst = CACHE_FIRST_EXTENSIONS.test(requestUrl.pathname);
+  const useCacheFirst =
+    CACHE_FIRST_EXTENSIONS.test(requestUrl.pathname) && !ALWAYS_FRESH.test(requestUrl.pathname);
 
   if (useCacheFirst) {
     // Cache-first: serve from cache instantly, fetch only on miss

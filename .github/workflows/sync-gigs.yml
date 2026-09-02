@@ -11,7 +11,13 @@ name: Sync Gigs
 on:
   schedule:
     # Every 6 hours, offset so it doesn't collide with the YouTube feed job.
+    # This is the safety net and the thing that expires shows once they pass --
+    # the sheet itself pokes us the moment it changes, via repository_dispatch.
     - cron: '17 */6 * * *'
+  repository_dispatch:
+    # Sent by the Apps Script bound to the Upcoming Gigs sheet. See
+    # scripts/sheet-trigger.gs and the "Publishing straight away" bit of GIGS.md.
+    types: [gigs-updated]
   workflow_dispatch:
     inputs:
       force_rebuild:
@@ -22,6 +28,11 @@ on:
 permissions:
   contents: write
   actions: write
+
+# A burst of sheet edits sends a burst of dispatches; only the newest matters.
+concurrency:
+  group: sync-gigs
+  cancel-in-progress: true
 
 jobs:
   sync-gigs:
@@ -55,7 +66,8 @@ jobs:
       - name: Did anything change?
         id: changed
         run: |
-          if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+          if [ "${{ github.event.inputs.force_rebuild }}" = "true" ] \
+             || [ "${{ github.event.client_payload.force }}" = "true" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Forced rebuild."
           elif git diff --quiet -- gigs.json index.html gigs/card-post.html gigs/card-story.html gigs/index.html; then
