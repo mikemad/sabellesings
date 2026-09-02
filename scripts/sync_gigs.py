@@ -2,7 +2,12 @@
 """Pull the Upcoming Gigs sheet (published as CSV) into gigs.json.
 
 Sabelle edits a Google Sheet; this turns it into data the site can render.
-Bad rows are skipped rather than published, and a sheet that yields no usable
+It is deliberately forgiving about how a date or a time is written, because
+the alternative is a show quietly not existing.
+
+A row is only ever dropped for something that makes it meaningless: a date
+nothing can parse, or no venue. A time it cannot read is passed through as
+typed rather than costing her the whole booking. A sheet that yields no usable
 rows at all leaves gigs.json untouched -- a typo should never wipe the list.
 
 gigs.json accumulates. The sheet is authoritative for anything still to come,
@@ -39,33 +44,94 @@ except Exception:  # pragma: no cover - zoneinfo missing/no tzdata
 GIGS_FILE = "gigs.json"
 FETCH_TIMEOUT = 30
 
-# Sabelle types "5-8pm" or "5:30 - 8:30 PM"; the site shows "5–8PM".
-TIME_RE = re.compile(
-    r"^\s*(\d{1,2}(?::\d{2})?)\s*(?:-|--|–|—|to)\s*(\d{1,2}(?::\d{2})?)\s*([ap])\.?m\.?\s*$",
-    re.IGNORECASE,
-)
-SINGLE_TIME_RE = re.compile(r"^\s*(\d{1,2}(?::\d{2})?)\s*([ap])\.?m\.?\s*$", re.IGNORECASE)
+# Sabelle writes "5-8pm", "5:30 - 8:30 PM", "5pm-8pm", "6 to 9 p.m." -- the
+# site shows "5–8PM". The meridiem may sit on either end, or both.
+_MER = r"(?:\s*([ap])\.?\s*m?\.?)?"
+_CLOCK = r"(\d{1,2}(?::\d{2})?)"
+_DASH = r"\s*(?:-{1,2}|–|—|to|until|till|’til)\s*"
+
+TIME_RE = re.compile(f"^\\s*{_CLOCK}{_MER}{_DASH}{_CLOCK}{_MER}\\s*$", re.IGNORECASE)
+SINGLE_TIME_RE = re.compile(f"^\\s*{_CLOCK}{_MER}\\s*$", re.IGNORECASE)
 
 
 def normalize_time(raw):
-    """'5:30 - 8:30 pm' -> '5:30–8:30PM'. Returns None if unparseable."""
+    """'5:30pm - 8:30pm' -> '5:30–8:30PM'. Returns None if unparseable.
+
+    A range that crosses noon or midnight keeps both meridiems ('11AM–2PM');
+    otherwise one on the end says it for both, which is how a gig poster reads.
+    """
     m = TIME_RE.match(raw)
     if m:
-        start, end, mer = m.groups()
-        return f"{start}–{end}{mer.upper()}M"
+        start, start_mer, end, end_mer = m.groups()
+        start, end = _drop_oclock(start), _drop_oclock(end)
+        if not (start_mer or end_mer):
+            return None  # "5-8" could be morning or evening; don't guess
+        end_mer = (end_mer or start_mer).upper()
+        start_mer = (start_mer or end_mer).upper()
+        if start_mer != end_mer:
+            return f"{start}{start_mer}M–{end}{end_mer}M"
+        return f"{start}–{end}{end_mer}M"
     m = SINGLE_TIME_RE.match(raw)
     if m:
         start, mer = m.groups()
-        return f"{start}{mer.upper()}M"
+        if mer:
+            return f"{_drop_oclock(start)}{mer.upper()}M"
     return None
 
 
-def normalize_date(raw, today):
-    """Accept 2026-07-09, 7/9/2026, 7/9/26, or a bare 7/9 (year inferred).
+def _drop_oclock(clock):
+    """'7:00' -> '7'. The site writes 5-8PM, not 5:00-8:00PM."""
+    return clock[:-3] if clock.endswith(":00") else clock
 
-    A bare month/day means the next occurrence: 01/05 typed in December is
-    next January, not eleven months ago.
+
+def tidy_time(raw):
+    """Whatever she typed, made safe to drop straight onto the poster."""
+    return re.sub(r"\s+", " ", raw).strip()[:24]
+
+
+MONTH_NAMES = [
+    "january", "february", "march", "april", "may", "june",
+    "july", "august", "september", "october", "november", "december",
+]
+
+# "Sept 12", "September 12, 2026", "Sep. 12th"
+NAME_DAY_RE = re.compile(
+    r"^([a-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s*,)?(?:\s+(\d{4}))?$", re.IGNORECASE
+)
+# "12 Sept", "12th September 2026"
+DAY_NAME_RE = re.compile(
+    r"^(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})\.?(?:\s*,)?(?:\s+(\d{4}))?$", re.IGNORECASE
+)
+
+
+def _month_from_name(word):
+    """'Sept' -> 9. Any unambiguous prefix of at least three letters."""
+    word = word.lower()
+    for i, name in enumerate(MONTH_NAMES, start=1):
+        if name.startswith(word):
+            return i
+    return None
+
+
+def _with_year(mo, d, y, today):
+    """Pin a month/day to a year, inferring the next occurrence if none given.
+
+    A bare date means the next one coming up: 01/05 typed in December is next
+    January, not eleven months ago.
     """
+    if y is not None:
+        y = int(y)
+        return _safe_date(y + 2000 if y < 100 else y, mo, d)
+    guess = _safe_date(today.year, mo, d)
+    if guess is None:
+        return None
+    if (today - guess).days > 7:
+        return _safe_date(today.year + 1, mo, d)
+    return guess
+
+
+def normalize_date(raw, today):
+    """Accept 2026-09-12, 9/12/2026, 9/12/26, a bare 9/12, or 'Sept 12'."""
     raw = raw.strip()
     m = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})$", raw)
     if m:
@@ -74,20 +140,16 @@ def normalize_date(raw, today):
 
     m = re.match(r"^(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2}|\d{4}))?$", raw)
     if m:
-        mo, d, y = m.group(1), m.group(2), m.group(3)
-        mo, d = int(mo), int(d)
-        if y is None:
-            guess = _safe_date(today.year, mo, d)
-            if guess is None:
-                return None
-            # Bare date already past by more than a week -> they mean next year.
-            if (today - guess).days > 7:
-                return _safe_date(today.year + 1, mo, d)
-            return guess
-        y = int(y)
-        if y < 100:
-            y += 2000
-        return _safe_date(y, mo, d)
+        return _with_year(int(m.group(1)), int(m.group(2)), m.group(3), today)
+
+    for pattern, name_first in ((NAME_DAY_RE, True), (DAY_NAME_RE, False)):
+        m = pattern.match(raw)
+        if not m:
+            continue
+        name, day = (m.group(1), m.group(2)) if name_first else (m.group(2), m.group(1))
+        mo = _month_from_name(name)
+        if mo:
+            return _with_year(mo, int(day), m.group(3), today)
     return None
 
 
@@ -156,7 +218,7 @@ def main():
         return 1
 
     today = _today()
-    gigs, skipped, data_rows = [], [], 0
+    gigs, skipped, warnings, data_rows = [], [], [], 0
 
     for i, row in enumerate(csv.DictReader(io.StringIO(body)), start=2):
         raw_date = pick(row, "date", "day")
@@ -168,19 +230,23 @@ def main():
             continue  # blank spacer row
         data_rows += 1
 
+        # Only a missing date or venue makes a row meaningless. A time we
+        # cannot read goes through as typed -- losing the whole booking over
+        # the time column is a far worse outcome than an odd-looking time.
         problems = []
         parsed = normalize_date(raw_date, today)
         if parsed is None:
             problems.append(f"date {raw_date!r}")
         if not venue:
             problems.append("venue is empty")
-        pretty_time = normalize_time(raw_time) if raw_time else ""
-        if raw_time and pretty_time is None:
-            problems.append(f"time {raw_time!r}")
-
         if problems:
             skipped.append(f"  row {i}: {', '.join(problems)}")
             continue
+
+        pretty_time = normalize_time(raw_time) if raw_time else ""
+        if raw_time and pretty_time is None:
+            pretty_time = tidy_time(raw_time)
+            warnings.append(f"  row {i}: kept time {raw_time!r} as typed")
 
         gigs.append(
             {
@@ -227,12 +293,15 @@ def main():
         f"{upcoming} upcoming, {len(gigs) - upcoming} past "
         f"({len(archived)} kept from the archive)."
     )
+    if warnings:
+        print(f"{len(warnings)} time(s) we could not tidy up:")
+        for w in warnings:
+            print(w)
     if skipped:
         print(f"Skipped {len(skipped)} bad row(s):")
         for s in skipped:
             print(s)
-        return 2
-    return 0
+    return 2 if (skipped or warnings) else 0
 
 
 if __name__ == "__main__":

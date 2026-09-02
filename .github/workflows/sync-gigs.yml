@@ -52,7 +52,7 @@ jobs:
           case "$code" in
             0) ;;
             1) echo "::warning::Sheet unavailable or unusable. Keeping the gigs.json already in the repo." ;;
-            2) echo "::warning::Some sheet rows were skipped -- see the log above. Good rows were published." ;;
+            2) echo "::warning::A row was skipped or a time could not be tidied -- see the log above. Everything usable was published." ;;
             *) echo "::error::sync_gigs.py failed with exit $code"; exit 1 ;;
           esac
 
@@ -63,6 +63,12 @@ jobs:
 
       # Screenshotting is slow and produces binary churn, so only do it when the
       # data or the card markup actually changed.
+      #
+      # gigs/index.html is deliberately not in the list below: it stamps the
+      # build date, so it differs every single day and would trigger a full
+      # screenshot-and-verify run plus a commit for nothing. It still gets
+      # regenerated and committed alongside a real change, which makes its
+      # stamp read as "last changed" rather than "last run".
       - name: Did anything change?
         id: changed
         run: |
@@ -70,7 +76,7 @@ jobs:
              || [ "${{ github.event.client_payload.force }}" = "true" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Forced rebuild."
-          elif git diff --quiet -- gigs.json index.html gigs/card-post.html gigs/card-story.html gigs/index.html; then
+          elif git diff --quiet -- gigs.json index.html gigs/card-post.html gigs/card-story.html; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Nothing changed; skipping screenshots."
           else

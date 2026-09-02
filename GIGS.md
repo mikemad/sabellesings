@@ -15,10 +15,13 @@ Open the **Upcoming Gigs** sheet and put one show per row:
 
 That's the whole job. A few things worth knowing:
 
-- **Dates** can be `2026-07-24`, `7/24/2026`, or just `7/24`. A bare `7/24` means
-  the next one coming up, so you can type it without thinking about the year.
-- **Times** can be `5-8pm`, `5:30 - 8:30 PM`, or `5 to 8 pm`. They all come out
-  looking the same on the site.
+- **Dates** can be `2026-07-24`, `7/24/2026`, `7/24`, `July 24`, `Jul 24`, or
+  `24 July`. A bare `7/24` or `July 24` means the next one coming up, so you can
+  type it without thinking about the year.
+- **Times** can be `5-8pm`, `5:30 - 8:30 PM`, `5pm-8pm`, `5 to 8 pm`, or
+  `11am-2pm`. They all come out looking the same on the site. If a time is
+  written some other way it goes on the site exactly as typed — an odd-looking
+  time never costs you the booking.
 - **Past shows move themselves.** The day after a show, it drops out of
   Upcoming Gigs and reappears under **Past Shows** further down the page, so
   the history builds up on its own. Leave the row in the sheet or delete it —
@@ -27,9 +30,10 @@ That's the whole job. A few things worth knowing:
 - Changes appear **within a minute or two** if the sheet's **Gigs → Publish
   now** menu is set up (see below); otherwise within about **6 hours**.
 
-If you typo something, that one row is skipped and the rest still publish. If
-the whole sheet is unreadable, the site just keeps showing the dates it already
-had — a bad edit can't take the schedule down.
+A row is only ever dropped for something that makes it meaningless: a date
+nothing can read, or a blank venue. Everything else publishes. If the whole
+sheet is unreadable, the site just keeps showing the dates it already had — a
+bad edit can't take the schedule down.
 
 ## Past shows
 
