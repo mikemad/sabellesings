@@ -93,8 +93,11 @@ def build_past_block(past):
     if not past:
         return f"    {PAST_START}\n    {PAST_END}"
 
+    # No count anywhere in here. This section only holds what has passed
+    # through the sheet, which is a fraction of what she has actually played --
+    # a total would read as a career tally and undersell her.
     total = len(past)
-    shows = "show" if total == 1 else "shows"
+    hidden = total - PAST_VISIBLE
     lines = [
         f"    {PAST_START}",
         "    <!-- Past Shows -->",
@@ -103,7 +106,7 @@ def build_past_block(past):
         '        <div class="tour-poster">',
         '            <div class="poster-header">',
         '                <h2 class="poster-title" id="past-shows-title">PAST SHOWS</h2>',
-        f'                <p class="poster-subtitle">{total} {shows} and counting</p>',
+        '                <p class="poster-subtitle">Where she\'s been playing</p>',
         "            </div>",
         '            <div class="tour-dates" id="past-gigs">',
         render_past_rows(past),
@@ -112,8 +115,8 @@ def build_past_block(past):
     if total > PAST_VISIBLE:
         lines.append(
             '            <button class="past-toggle" type="button" hidden'
-            f' aria-expanded="true" aria-controls="past-gigs" data-total="{total}">'
-            f"Show all {total} past shows</button>"
+            f' aria-expanded="true" aria-controls="past-gigs" data-hidden="{hidden}">'
+            f"Show {hidden} more</button>"
         )
     lines += ["        </div>", "    </section>", f"    {PAST_END}"]
     return "\n".join(lines)

@@ -38,9 +38,13 @@ bad edit can't take the schedule down.
 ## Past shows
 
 Everything that has already happened is listed under **Past Shows**, below the
-upcoming dates — the point being that a year of steady gigs looks like a year of
+upcoming dates — the point being that a run of steady gigs looks like a run of
 steady gigs. The list is grouped by year, newest first, and shows the twelve
 most recent with a button for the rest.
+
+The section deliberately carries no total. It can only ever hold shows that
+passed through the sheet, which is a fraction of what Sabelle has actually
+played, so a count would read as a career tally and undersell her.
 
 Two things to know:
 

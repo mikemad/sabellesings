@@ -355,12 +355,14 @@ document.querySelectorAll('section').forEach(section => {
     const btn = document.querySelector('.past-toggle');
     if (!list || !btn || !list.querySelector('.past-overflow')) return;
 
-    const total = btn.dataset.total || list.querySelectorAll('.tour-date').length;
+    // How many rows are folded away -- not how many shows she has played.
+    const hidden = btn.dataset.hidden
+        || list.querySelectorAll('.tour-date.past-overflow').length;
 
     const sync = () => {
         const collapsed = list.classList.contains('is-collapsed');
         btn.setAttribute('aria-expanded', String(!collapsed));
-        btn.textContent = collapsed ? `Show all ${total} past shows` : 'Show fewer';
+        btn.textContent = collapsed ? `Show ${hidden} more` : 'Show fewer';
     };
 
     list.classList.add('is-collapsed');
