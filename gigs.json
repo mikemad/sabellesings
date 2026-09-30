@@ -120,6 +120,42 @@
       "venue": "The Lodge",
       "city": "Pebble Beach, CA",
       "time": "5–8PM"
+    },
+    {
+      "date": "2026-10-02",
+      "venue": "Taste of Monterey",
+      "city": "Monterey, CA",
+      "time": "5–7PM"
+    },
+    {
+      "date": "2026-10-16",
+      "venue": "Taste of Monterey",
+      "city": "Monterey, CA",
+      "time": "5–7PM"
+    },
+    {
+      "date": "2026-10-17",
+      "venue": "The Lodge",
+      "city": "Pebble Beach, CA",
+      "time": "5–8PM"
+    },
+    {
+      "date": "2026-10-22",
+      "venue": "Monterey Plaza Hotel",
+      "city": "Monterey, CA",
+      "time": "6–10PM"
+    },
+    {
+      "date": "2026-10-30",
+      "venue": "Taste of Monterey",
+      "city": "Monterey, CA",
+      "time": "5–7PM"
+    },
+    {
+      "date": "2026-10-31",
+      "venue": "Hyatt Monterey",
+      "city": "Monterey, CA",
+      "time": "7–10PM"
     }
   ]
 }
